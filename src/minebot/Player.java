@@ -1,8 +1,11 @@
 package minebot;
 
 import java.io.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Player {
+	
 	public int spawnX;
 	public int spawnY;
 	public int spawnZ;
@@ -21,7 +24,10 @@ public class Player {
 	
 	public Inventory inventory;
 	
-	public Player(DataOutputStream out, Map map) {
+	private Queue<Move> moveList;
+	public LinkedList<NamedEntity> entityList;
+	
+	public Player(DataOutputStream out, Map map) throws SecurityException, IOException {
 		spawnX = 0;
 		spawnY = 0;
 		spawnZ = 0;
@@ -38,6 +44,8 @@ public class Player {
 		digX = digY = digZ = 0;
 		
 		inventory = new Inventory();
+		moveList = new LinkedList<Move>();
+		entityList = new LinkedList<NamedEntity>();
 	}
 	
 	public void logic() throws IOException {
@@ -46,7 +54,7 @@ public class Player {
 		lastTick = tempTime;
 		output.writeByte(0);
 		
-		int speed = 50;
+		int speed = 100;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 
@@ -61,18 +69,19 @@ public class Player {
 			output.writeFloat(yaw);
 			output.writeFloat(pitch);
 			output.writeBoolean(onGround);
+							
+			if (map.block(x,y-1,z) == 0 && moveList.isEmpty()) {
+				addMove(0,-1,0);
+			}
 						
-			if (canMove(x+1,y,z))
-				x += 1;
-			else if (!digging) {
-				if (map.block(x+1,y,z) != 0) {
-					this.dig(x+1,y,z);
-				} else if (map.block(x+1,y+1,z) != 0) {
-					this.dig(x+1,y+1,z);
-				} else if (map.block(x+1,y-1,z) == 0) {
-					this.placeBlock(4,(int)x, (int)y-1, (int)z);
-				}
-			} 
+			if (!moveList.isEmpty()) {
+				Move move = moveList.remove();
+				
+				x += move.x;
+				y += move.y;
+				stance += move.y;
+				z += move.z;
+			}	
 			
 			moveTime -= speed;
 		}
@@ -88,6 +97,10 @@ public class Player {
 			return false;
 	}
 	
+	private void addMove(int x, int y, int z) {
+		moveList.add(new Move(x,y,z));
+	}
+	
 	private void dig(double x, double y, double z) throws IOException {
 		dig((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z));
 	}
@@ -96,7 +109,7 @@ public class Player {
 		int slot = inventory.equip(274);
 		if (slot != -1) { 
 			output.writeByte(0x10);
-			output.writeByte(slot-36);
+			output.writeShort(slot-36);
 		}
 		
 		digging = true;
@@ -119,6 +132,7 @@ public class Player {
 	}
 	
 	private void placeBlock(int type, int x, int y, int z) throws IOException {
+		//System.out.println("Placing block.");
 		int slot = inventory.equip(type);
 		if (slot == -1) {
 			return;
@@ -134,9 +148,11 @@ public class Player {
 		output.writeByte(y);
 		output.writeInt(z);
 		output.writeByte(5);
-		output.writeShort(type);
+		output.writeShort(item.type);
 		output.writeByte(item.count);
 		output.writeShort(item.uses);
+		
+
 	}
 	
 	public void printData() {
@@ -147,4 +163,14 @@ public class Player {
 	public void doneDigging() {
 		digging = false;
 	}
+	
+	public void handleChat(String msg) {
+		System.out.println(msg);
+		String name = msg.substring(0,6);
+		String cmd = msg.substring(6);
+	}
+	
+	private void AStar(double x, double y, double z) {
+		
+	}	
 }

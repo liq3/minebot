@@ -1,14 +1,18 @@
 package minebot;
+
 import java.io.IOException;
 import java.net.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.io.*;
 import java.lang.Integer;
 
-public class minebot
+public class Minebot
 {
 	private static Player player;
 	private static int lastOpcode;
 	private static Map map;
+
 	
 	public static void main(String args[]) throws UnknownHostException, IOException
 	{
@@ -56,6 +60,7 @@ public class minebot
 		Socket socket = new Socket(host, port);
 		DataInputStream input = new DataInputStream(socket.getInputStream());
 		DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+		
 		
 		map = new Map();
 		player = new Player(output, map);		
@@ -127,7 +132,7 @@ public class minebot
 				case 0x03: {// Chat message
 					int len = input.readShort();
 					input.read(buff, 0, len*2);
-					System.out.println(new String(buff, "UTF-16BE"));
+					player.handleChat(new String(buff, 0, len*2, "UTF-16BE"));
 					break;
 				}
 				case 0x04: // Time
@@ -199,15 +204,16 @@ public class minebot
 					input.readByte();
 					break;
 				case 0x14: { // Named Entity Spawn
-					input.readInt();
+					int EID = input.readInt();
 					int len = input.readShort();
 					input.read(buff, 0, len*2);
-					input.readInt();
-					input.readInt();
-					input.readInt();
-					input.readByte();
-					input.readByte();
-					input.readShort();
+					int x = input.readInt();
+					int y = input.readInt();
+					int z = input.readInt();
+					int yaw = input.readByte();
+					int pitch = input.readByte();
+					int item = input.readShort();
+					player.entityList.add(new NamedEntity(EID,new String(buff, 0, len*2, "UTF-16BE"), x,y,z, yaw,pitch, item));
 					break;
 				}
 				case 0x15: // Pickup Spawn
@@ -290,11 +296,17 @@ public class minebot
 					input.readInt();
 					readMetadata(input);
 					break;
-				case 0x32:
-					input.readInt();
-					input.readInt();
-					input.readBoolean();
+				case 0x32: {
+					int cx = input.readInt();
+					int cz = input.readInt();
+					boolean mode = input.readBoolean();
+					if (mode) {
+						map.createEmptyChunk(cx, cz);
+					} else {
+						map.deleteChunk(cx, cz);
+					}
 					break;
+				}
 				case 0x33: {
 					int x = input.readInt();
 					int y = input.readShort();
@@ -306,18 +318,22 @@ public class minebot
 					byte data[] = new byte[size];
 					int recv = input.read(data, 0, size);
 					while (recv < size) {
-						System.out.println("0x33 recieved "+ recv+" instead of "+size);
 						recv += input.read(data, recv, size-recv);
 					}
 					map.readChunkData(x,y,z,sx,sy,sz,data);
 					break;
 				}
-				case 0x34: {
-					System.out.println("IMPLEMENT 0x34 YOU LAZY BUM!!!!");
-					input.readInt();
-					input.readInt();
+				case 0x34: {					
+					int chunkX = input.readInt();
+					int chunkZ = input.readInt();
 					int len = input.readShort();
-					input.read(buff, 0, len*4);
+					byte[] coords = new byte[len*2];					
+					byte[] types = new byte[len];
+					byte[] metadata = new byte[len];
+					input.read(coords, 0, len*2);
+					input.read(types, 0, len);					
+					input.read(metadata, 0, len);
+					map.multiBlockChange(chunkX, chunkZ, len, coords, types, metadata);
 					break;
 				}
 				case 0x35: { //Block change
@@ -325,7 +341,7 @@ public class minebot
 					int y = input.readByte();
 					int z = input.readInt();
 					int type = input.readByte();
-					int metadat = input.readByte();
+					int metadata = input.readByte();
 					map.setBlockType(x,y,z,type);
 					break;
 				}

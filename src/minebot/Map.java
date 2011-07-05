@@ -44,8 +44,8 @@ public class Map {
 		int cx = (int)(x) >> 4;
 		int cz = (int)(z) >> 4;
 		String key = cx+"."+cz;
-		if (size == 16*16*128) {
-			chunks.put(cx+"."+cz, blockData);
+		if (!chunks.containsKey(key) && size == 16*16*128) {
+			chunks.put(key, blockData);
 		} else if (chunks.containsKey(key)) {
 			x = x & 15;
 			y = y & 127;
@@ -71,7 +71,7 @@ public class Map {
 		int index = getIndex(x,y,z);
 		int cx = (int)(x) >> 4;
 		int cz = (int)(z) >> 4;
-		String key = cx+"."+cz;
+		String key = getKey(cx, cz);
 		if (chunks.containsKey(key)) {
 			return chunks.get(key)[index];
 		} else {
@@ -81,7 +81,7 @@ public class Map {
 	}
 	
 	public void setBlockType(int x, int y, int z, int type) {
-		String key = (x >> 4) + "." + (z >> 4);
+		String key = getKey(x >> 4, z >> 4);
 		if (chunks.containsKey(key)) {
 			chunks.get(key)[getIndex(x,y,z)] = (byte)(type);
 		}
@@ -89,5 +89,39 @@ public class Map {
 	
 	private int getIndex(int x, int y, int z) {
 		return (y&127) + (((z&15) * 128) + ((x&15) * 128 * 16));
+	}
+	
+	public void multiBlockChange(int cx, int cz, int len, byte[] coords, byte[] types, byte[] metadata) {
+		String key = getKey(cx,cz);
+		int[] x = new int[len];
+		int[] y = new int[len];
+		int[] z = new int[len];
+		for (int i = 0; i < len; i++) {
+			x[i] = coords[i*2] >> 4;
+			z[i] = coords[i*2] & 15;
+			y[i] = coords[i*2+1];
+		}
+		for (int i = 0; i < len; i++) {
+			chunks.get(key)[getIndex(x[i],y[i],z[i])] = types[i];
+		}
+	}
+	
+	public void createEmptyChunk(int cx, int cz) {
+		String key = getKey(cx, cz);
+		if (!chunks.containsKey(key)) {
+			byte[] block = new byte[128*16*16];
+			for (int i = 0; i < 128*16*16; i++) {
+				block[i] = 0;
+			}
+			chunks.put(key, block);
+		}
+	}
+	
+	public void deleteChunk(int cx, int cz) {
+		chunks.remove(getKey(cx,cz));
+	}
+	
+	private String getKey(int cx, int cz) {
+		return new String(cx+"."+cz);
 	}
 }
