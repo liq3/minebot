@@ -124,4 +124,15 @@ public class Map {
 	private String getKey(int cx, int cz) {
 		return new String(cx+"."+cz);
 	}
+	
+	public boolean canStand(double x, double y, double z) {		
+		int b1 = block(x,y-1,z);
+		int b2 = block(x,y,z);
+		int b3 = block(x,y+1,z);
+
+		if (b1 != 0 && b2 == 0 && b3 == 0) {
+			return true;
+		}
+		return false;
+	}
 }

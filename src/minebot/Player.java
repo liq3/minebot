@@ -2,6 +2,7 @@ package minebot;
 
 import java.io.*;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Player {
@@ -54,7 +55,7 @@ public class Player {
 		lastTick = tempTime;
 		output.writeByte(0);
 		
-		int speed = 100;
+		int speed = 500;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 
@@ -76,25 +77,15 @@ public class Player {
 						
 			if (!moveList.isEmpty()) {
 				Move move = moveList.remove();
-				
-				x += move.x;
+
+				x = Math.floor(x+move.x)+0.5;
 				y += move.y;
 				stance += move.y;
-				z += move.z;
+				z = Math.floor(z+move.z)+0.5;
 			}	
 			
 			moveTime -= speed;
 		}
-	}
-
-	private boolean canMove(double x, double y, double z) {		
-		int b1 = map.block(x,y-1,z);
-		int b2 = map.block(x,y,z);
-		int b3 = map.block(x,y+1,z);
-		if (b1 != 0 && b2 == 0 && b3 == 0)
-			return true;
-		else 
-			return false;
 	}
 	
 	private void addMove(int x, int y, int z) {
@@ -166,11 +157,28 @@ public class Player {
 	
 	public void handleChat(String msg) {
 		System.out.println(msg);
-		String name = msg.substring(0,6);
-		String cmd = msg.substring(6);
+		String name = msg.substring(0,7);
+		String cmd = msg.substring(7);
+		if (name.equals("<liq3> ") && cmd.equals("move")) {
+			NamedEntity ent = null; 
+			for (int i = 0; i < entityList.size(); i++) {
+				if (entityList.get(i).name.equals("liq3")) {
+					ent = entityList.get(i);
+					break;
+				}
+			}
+			if (ent != null) {
+				AStar AStarPath = new AStar(map);
+				PathBlock[] path = AStarPath.getPath(x,y,z, ent.x, ent.y, ent.z);
+				if (path == null) return;
+				for (int i = path.length-1; i > 0; i--) {
+					addMove(path[i-1].x - path[i].x, path[i-1].y - path[i].y, path[i-1].z - path[i].z);
+				}
+			}
+		}
 	}
 	
-	private void AStar(double x, double y, double z) {
-		
-	}	
+
+	
+	
 }
