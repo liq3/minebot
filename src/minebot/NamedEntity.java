@@ -18,4 +18,16 @@ public class NamedEntity {
 		this.currentItem = currentItem;
 		System.out.println("NamedEntity EID:"+EID+" Name:"+name+" xyz:"+this.x+" "+this.y+" "+this.z+" yawpitch:"+yaw+" "+pitch+" "+currentItem);
 	}
+	
+	public void moveDelta(int dx, int dy, int dz) {
+		this.x += dx/32;
+		this.y += dy/32;
+		this.z += dz/32;
+	}
+	
+	public void teleport(int x, int y, int z) {
+		this.x = x/32;
+		this.y = y/32;
+		this.z = z/32;
+	}
 }

@@ -2,7 +2,6 @@ package minebot;
 
 import java.io.*;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public class Player {
@@ -55,7 +54,7 @@ public class Player {
 		lastTick = tempTime;
 		output.writeByte(0);
 		
-		int speed = 500;
+		int speed = 50;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 
@@ -168,6 +167,10 @@ public class Player {
 				}
 			}
 			if (ent != null) {
+				if (y != ent.y) {
+					System.out.println("Can't do height.");
+					return;
+				}
 				AStar AStarPath = new AStar(map);
 				PathBlock[] path = AStarPath.getPath(x,y,z, ent.x, ent.y, ent.z);
 				if (path == null) return;

@@ -262,13 +262,21 @@ public class Minebot
 					break;
 				case 0x1F: {
  					int EID = input.readInt();
-					int x = input.readByte();
-					int y = input.readByte();
-					int z = input.readByte();
+					int dx = input.readByte();
+					int dy = input.readByte();
+					int dz = input.readByte();
 					if (EID == player.EID) {
-						player.x += (double)x/32;
-						player.stance = player.y += (double)y/32;
-						player.z += (double)z/32;
+						player.x += (double)dx/32;
+						player.y += (double)dy/32;
+						player.stance += (double)dy/32;
+						player.z += (double)dz/32;
+					} else {
+						for (int i = 0; i < player.entityList.size(); i++) {
+							NamedEntity ent = player.entityList.get(i);
+							if (ent.EID == EID) {
+								ent.moveDelta(dx, dy, dz);
+							}
+						}
 					}
 					break;
 				}
@@ -277,13 +285,50 @@ public class Minebot
 					input.readByte();
 					input.readByte();
 					break;
-				case 0x21:
-					input.readInt();
-					input.read(buff, 0, 5);
+				case 0x21: { // Entity Relative Move and Look
+					int EID = input.readInt();
+					int dx = input.readByte();
+					int dy = input.readByte();
+					int dz = input.readByte();
+					input.readByte();
+					input.readByte();
+					if (EID == player.EID) {
+						player.x += (double)dx/32;
+						player.y += (double)dy/32;
+						player.stance += (double)dy/32;
+						player.z += (double)dz/32;
+					} else {
+						for (int i = 0; i < player.entityList.size(); i++) {
+							NamedEntity ent = player.entityList.get(i);
+							if (ent.EID == EID) {
+								ent.moveDelta(dx, dy, dz);
+							}
+						}
+					}
 					break;
-				case 0x22:
-					input.read(buff, 0, 18);
+				}
+				case 0x22: {
+					int EID = input.readInt();
+					int x = input.readInt();
+					int y = input.readInt();
+					int z = input.readInt();
+					input.readByte();
+					input.readByte();
+					if (EID == player.EID) {
+						player.x = (double)x/32;
+						player.y = (double)y/32;
+						player.stance = (double)y/32 + 1.62;
+						player.z = (double)z/32;
+					} else {
+						for (int i = 0; i < player.entityList.size(); i++) {
+							NamedEntity ent = player.entityList.get(i);
+							if (ent.EID == EID) {
+								ent.teleport(x, y, z);
+							}
+						}
+					}
 					break;
+				}
 				case 0x26:
 					input.readInt();
 					input.readByte();
