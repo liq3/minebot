@@ -14,7 +14,12 @@ public class AStar {
 		return getPath((int)sx, (int)sy, (int)sz, (int)dx, (int)dy, (int)dz);
 	}	
 	
-	public PathBlock[] getPath(int sx, int sy, int sz, int dx, int dy, int dz) {		
+	public PathBlock[] getPath(int sx, int sy, int sz, int dx, int dy, int dz) {
+		if (!map.canStand(dx, dy, dz)) {
+			System.out.println("Path: Invalid destination.");
+			return null;
+		}
+		
 		AStarList closed = new AStarList();
 		AStarList open = new AStarList();
 		
@@ -47,7 +52,7 @@ public class AStar {
 			
 			int[][] dirs = {{-1,0},{1,0},{0,-1},{0,1}};
 			for (int i = 0; i < 4; i++) {
-				int bx = (int)block.x+dirs[i][0], bz = (int)block.z+dirs[i][1];				
+				int bx = block.x+dirs[i][0], bz = block.z+dirs[i][1];				
 				if (map.canStand(bx,block.y,bz)) {
 					PathBlock newBlock = new PathBlock(bx,block.y,bz,dx,dy,dz,block);
 					if (!closed.contains(newBlock) && !open.contains(newBlock)) {
@@ -60,15 +65,15 @@ public class AStar {
 					if (!closed.contains(newBlock) && !open.contains(newBlock) && !closed.contains(newBlock2)) {
 						closed.add(newBlock2);
 						open.add(newBlock);
-					}	
-				} 
+					}
+				}
 				if (map.canStand(bx,block.y+1,bz) && map.block(block.x,block.y+2,block.z) == 0) {
 					PathBlock newBlock2 = new PathBlock(block.x,block.y+1,block.z,dx,dy,dz,block);
 					PathBlock newBlock = new PathBlock(bx,block.y+1,bz,dx,dy,dz,newBlock2);
 					if (!closed.contains(newBlock) && !open.contains(newBlock) && !closed.contains(newBlock2)) {
 						closed.add(newBlock2);
 						open.add(newBlock);
-					}	
+					}
 				}
 			}
 			

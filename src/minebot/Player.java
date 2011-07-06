@@ -167,9 +167,9 @@ public class Player {
 				}
 			}
 			if (ent != null) {
-				System.out.println("Starting path");
+				System.out.println("Starting path. Start:"+x+","+y+","+z+" End:"+ent.x+","+ent.y+","+ent.z);
 				AStar AStarPath = new AStar(map);
-				PathBlock[] path = AStarPath.getPath(x,y,z, ent.x, ent.y, ent.z);
+				PathBlock[] path = AStarPath.getPath(Math.floor(x),Math.floor(y),Math.floor(z), Math.floor(ent.x), Math.floor(ent.y), Math.floor(ent.z));
 				if (path == null) {
 					System.out.println("No path.");
 					return;
