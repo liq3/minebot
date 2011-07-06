@@ -54,7 +54,7 @@ public class Player {
 		lastTick = tempTime;
 		output.writeByte(0);
 		
-		int speed = 50;
+		int speed = 350;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 
@@ -167,16 +167,18 @@ public class Player {
 				}
 			}
 			if (ent != null) {
-				if (y != ent.y) {
-					System.out.println("Can't do height.");
-					return;
-				}
+				System.out.println("Starting path");
 				AStar AStarPath = new AStar(map);
 				PathBlock[] path = AStarPath.getPath(x,y,z, ent.x, ent.y, ent.z);
-				if (path == null) return;
-				for (int i = path.length-1; i > 0; i--) {
-					addMove(path[i-1].x - path[i].x, path[i-1].y - path[i].y, path[i-1].z - path[i].z);
+				if (path == null) {
+					System.out.println("No path.");
+					return;
 				}
+				System.out.println("Found path!");
+				for (int i = path.length-1; i > 0; i--) {
+					System.out.println("Node: "+path[i].x+" "+path[i].y+" "+path[i].z);
+					addMove(path[i-1].x - path[i].x, path[i-1].y - path[i].y, path[i-1].z - path[i].z);
+				}				
 			}
 		}
 	}

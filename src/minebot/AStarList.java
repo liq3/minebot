@@ -1,15 +1,15 @@
 package minebot;
 
-import java.util.LinkedList;
+import java.util.Vector;
 
 public class AStarList {
-	private LinkedList<PathBlock> list;
+	private Vector<PathBlock> list;
 	
 	public AStarList() {
-		list = new LinkedList<PathBlock>();
+		list = new Vector<PathBlock>();
 	}
 	
-	public void add(PathBlock b) {		
+	public void add(PathBlock b) {
 		list.add(b);
 	}
 	
@@ -72,6 +72,6 @@ public class AStarList {
 	}
 	
 	public PathBlock last() {
-		return list.getLast();
+		return list.lastElement();
 	}
 }
