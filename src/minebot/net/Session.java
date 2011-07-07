@@ -1,7 +1,11 @@
-package minebot;
+package minebot.net;
 
 import java.io.*;
 import java.net.*;
+
+import minebot.Player;
+import minebot.world.NamedEntity;
+import minebot.world.World;
 
 
 public class Session {

@@ -1,4 +1,5 @@
-package minebot;
+package minebot.world;
+
 
 public final class ObjectEntity extends Entity {
 	

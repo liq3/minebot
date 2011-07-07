@@ -2,6 +2,8 @@ package minebot;
 
 import java.io.*;
 
+import minebot.net.Session;
+
 public class Minebot
 {
 	private static Player player;

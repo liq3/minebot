@@ -1,4 +1,4 @@
-package minebot;
+package minebot.world;
 
 public class Item {
 	public int ID;

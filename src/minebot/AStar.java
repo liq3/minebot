@@ -1,5 +1,8 @@
 package minebot;
 
+import minebot.world.ItemID;
+import minebot.world.World;
+
 
 public class AStar {
 	

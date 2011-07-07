@@ -1,6 +1,8 @@
-package minebot;
+package minebot.net;
 
 import java.io.*;
+
+import minebot.Player;
 
 public final class PacketWriter extends DataOutputStream {
 	public static final int PROTOCOL_VERSION = 14;

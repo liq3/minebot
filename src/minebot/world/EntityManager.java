@@ -1,6 +1,7 @@
-package minebot;
+package minebot.world;
 
 import java.util.HashMap;
+
 
 public final class EntityManager {
 	

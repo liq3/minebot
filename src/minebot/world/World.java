@@ -1,10 +1,11 @@
-package minebot;
+package minebot.world;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.*;
+
 
 
 public final class World {

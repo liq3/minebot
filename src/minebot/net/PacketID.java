@@ -1,4 +1,4 @@
-package minebot;
+package minebot.net;
 
 public final class PacketID {
 	

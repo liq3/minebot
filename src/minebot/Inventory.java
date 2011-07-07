@@ -1,5 +1,7 @@
 package minebot;
 
+import minebot.world.Item;
+
 public class Inventory {
 	private Item[] items;
 	public int holdingSlot;

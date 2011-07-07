@@ -1,4 +1,5 @@
-package minebot;
+package minebot.world;
+
 
 public class ItemEntity extends Entity {
 	public Item item;

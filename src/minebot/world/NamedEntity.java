@@ -1,4 +1,5 @@
-package minebot;
+package minebot.world;
+
 
 public class NamedEntity extends Entity {
 	public String name;
