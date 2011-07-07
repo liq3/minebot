@@ -386,7 +386,7 @@ public class Minebot
 					int y = input.readByte();
 					int z = input.readInt();
 					int type = input.readByte();
-					int metadata = input.readByte();
+					input.readByte();
 					map.setBlockType(x,y,z,type);
 					break;
 				}

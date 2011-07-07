@@ -54,7 +54,7 @@ public class Player {
 		lastTick = tempTime;
 		output.writeByte(0);
 		
-		int speed = 350;
+		int speed = 50;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 
@@ -70,7 +70,7 @@ public class Player {
 			output.writeFloat(pitch);
 			output.writeBoolean(onGround);
 							
-			if (map.block(x,y-1,z) == 0 && moveList.isEmpty()) {
+			if (!ItemType.solid[ map.block(x,y-1,z) ] && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						
