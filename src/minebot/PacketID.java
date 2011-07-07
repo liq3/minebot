@@ -40,6 +40,7 @@ public final class PacketID {
 	public static final int ChunkLoad			= 0x33;
 	public static final int MultiBlockChange	= 0x34;
 	public static final int BlockChange			= 0x35;
+	public static final int SoundEffect         = 0x3D;
 	public static final int WindowClick			= 0x66;
 	public static final int SetSlot				= 0x67;
 	public static final int WindowItem			= 0x68;

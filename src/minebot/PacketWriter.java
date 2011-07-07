@@ -28,10 +28,17 @@ public final class PacketWriter extends DataOutputStream {
 		writeUTF(str);
 	}
 	public void writeString16(String str) throws IOException {
-		writeChars(str);
+		writeShort(str.length());
+		write(str.getBytes("UTF-16BE"), 0, str.length()*2);
 	}
+	
+	public void writeKeepAlive() throws IOException {
+		writeByte(PacketID.KeepAlive);
+	}
+	
 	public void writeLoginRequest(String username) throws IOException {
 		writeByte(PacketID.LoginRequest);
+		writeInt(PROTOCOL_VERSION);
 		writeString16(username);
 		writeLong(0);
 		writeByte(0);
@@ -97,25 +104,25 @@ public final class PacketWriter extends DataOutputStream {
 		writeInt(0);
 		writeByte(0);
 	}
-	public void writeBlockPlacement(int x, int y, int z, int dir, int ID) throws IOException {
+	public void writeBlockPlacement(int x, int y, int z, int dir) throws IOException {
 		writeByte(PacketID.BlockPlacement);
 		writeInt(x);
 		writeByte(y);
 		writeInt(z);
 		writeByte(dir);
-		writeShort(ID);
-		writeByte(1); // default for this overload
-		writeShort(0); // wait, why is this needed? I'll just throw in zero
+		writeShort(-1); // No item
 	}
-	public void writeBlockPlacement(int x, int y, int z, int dir, int ID, int amount) throws IOException {
+	public void writeBlockPlacement(int x, int y, int z, int dir, int ID, int amount, int uses) throws IOException {
 		writeByte(PacketID.BlockPlacement);
 		writeInt(x);
 		writeByte(y);
 		writeInt(z);
 		writeByte(dir);
 		writeShort(ID);
-		writeByte(amount);
-		writeShort(0); // because shouldn't the server know this?
+		if (ID > -1) {
+			writeByte(amount);
+			writeShort(uses);
+		}
 	}
 	public void writeHoldingChange(int slot) throws IOException {
 		writeByte(PacketID.HoldingChange);

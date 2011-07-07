@@ -130,7 +130,7 @@ public class Map {
 		int b2 = block(x,y,z);
 		int b3 = block(x,y+1,z);
 
-		if (b1 != 0 && b2 == 0 && b3 == 0) {
+		if (ItemType.solid[b1] && !ItemType.solid[b2] && !ItemType.solid[b3]) {
 			return true;
 		}
 		return false;

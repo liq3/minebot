@@ -13,12 +13,11 @@ public class Player {
 	public double stance;
 	public float yaw, pitch;
 	public boolean onGround;
-	private DataOutputStream output;
 	private long moveTime;
 	private long lastTick;
 	public boolean spawned;
 	public int EID;
-	private Map map;
+	
 	private boolean digging;
 	private int digX, digY, digZ;
 	
@@ -27,7 +26,11 @@ public class Player {
 	private Queue<Move> moveList;
 	public LinkedList<NamedEntity> entityList;
 	
-	public Player(DataOutputStream out, Map map) throws SecurityException, IOException {
+	private Session session;
+	private PacketWriter writer;
+	private Map map;
+	
+	public Player(Session session) throws SecurityException, IOException {
 		spawnX = 0;
 		spawnY = 0;
 		spawnZ = 0;
@@ -35,42 +38,38 @@ public class Player {
 		x = z = 0;
 		yaw = pitch = 0;
 		onGround = true;
-		output = out;
 		moveTime = 0;
 		lastTick = System.currentTimeMillis();
 		spawned = false;
-		this.map = map;
+
 		digging = false;
 		digX = digY = digZ = 0;
 		
 		inventory = new Inventory();
 		moveList = new LinkedList<Move>();
 		entityList = new LinkedList<NamedEntity>();
+		
+		this.session = session;
+		this.map = session.map;
+		this.writer = session.writer;
 	}
 	
 	public void logic() throws IOException {
 		long tempTime = System.currentTimeMillis();
 		moveTime += tempTime - lastTick;
 		lastTick = tempTime;
-		output.writeByte(0);
+		session.writer.writeKeepAlive();
 		
-		int speed = 350;
+		int speed = 50;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 
 				digging = false;
 			}
 			
-			output.writeByte(0x0D);
-			output.writeDouble(x);
-			output.writeDouble(y);
-			output.writeDouble(stance);
-			output.writeDouble(z);
-			output.writeFloat(yaw);
-			output.writeFloat(pitch);
-			output.writeBoolean(onGround);
+			writer.writePositionAndLook(this);
 							
-			if (map.block(x,y-1,z) == 0 && moveList.isEmpty()) {
+			if (!ItemType.solid[ map.block(x,y-1,z) ] && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						
@@ -98,27 +97,15 @@ public class Player {
 	private void dig(int x, int y, int z) throws IOException {
 		int slot = inventory.equip(274);
 		if (slot != -1) { 
-			output.writeByte(0x10);
-			output.writeShort(slot-36);
+			writer.writeHoldingChange(slot-36);
 		}
 		
 		digging = true;
 		digX = x;
 		digY = y;
 		digZ = z;
-		output.writeByte(0x0E);
-		output.writeByte(0);
-		output.writeInt(x);
-		output.writeByte(y);
-		output.writeInt(z);
-		output.writeByte(1);
-		
-		output.writeByte(0x0E);
-		output.writeByte(2);
-		output.writeInt(x);
-		output.writeByte(y);
-		output.writeInt(z);
-		output.writeByte(1);
+		writer.writeDigging(PacketWriter.DIGGING_BEGIN, x, y, z, 4);		
+		writer.writeDigging(PacketWriter.DIGGING_END, x,y,z, 4);
 	}
 	
 	private void placeBlock(int type, int x, int y, int z) throws IOException {
@@ -128,21 +115,11 @@ public class Player {
 			return;
 		}
 		
-		output.writeByte(0x10);
-		output.writeShort(slot-36);
+		writer.writeHoldingChange(slot-36);
 	
 		Item item = inventory.getItem(slot);
 		
-		output.writeByte(0x0F);
-		output.writeInt(x);
-		output.writeByte(y);
-		output.writeInt(z);
-		output.writeByte(5);
-		output.writeShort(item.type);
-		output.writeByte(item.count);
-		output.writeShort(item.uses);
-		
-
+		writer.writeBlockPlacement(x,y,z,0, item.type, item.count, item.uses);
 	}
 	
 	public void printData() {

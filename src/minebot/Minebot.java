@@ -30,7 +30,7 @@ public class Minebot
 		session.login();
 		session.connect("localhost", 25565);
 		
-		player = new Player();
+		player = new Player(session);
 		session.begin(player);
 	}
 }
