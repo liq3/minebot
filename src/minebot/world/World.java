@@ -78,7 +78,7 @@ public final class World {
 			return chunks.get(key)[index];
 		} else {
 			//System.out.println("Chunk doesn't exist."+x+" "+y+" "+z+" "+cx+" "+cz);
-			return -1;
+			return 0;
 		}
 	}
 	

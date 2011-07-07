@@ -6,7 +6,6 @@ public class Entity {
 	public double yaw, pitch;
 	
 	public Entity() {
-		
 	}
 	
 	public Entity(int EID, int x, int y, int z, int yaw, int pitch) {
