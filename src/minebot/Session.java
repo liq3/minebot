@@ -27,18 +27,25 @@ public class Session {
 	
 	// Login to minecraft.net
 	public void login() throws IOException {
-		String loginData = String.format("user=%s&password=%s&version=9001", username, password);
+		//String loginData = String.format("user=%s&password=%s&version=9001", username, password);
+		String loginData = URLEncoder.encode("user", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
+		loginData += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
+		loginData += "&" + URLEncoder.encode("version", "UTF-8") + "=" + URLEncoder.encode("12", "UTF-8");
 		
 		URL url = new URL("https://login.minecraft.net");
 		URLConnection conn = url.openConnection();
+		conn.setDoOutput(true);
 		
 		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-		wr.write(URLEncoder.encode(loginData, "UTF-8"));
+		wr.write(loginData);
 		wr.flush();
 		
 		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		String line = rd.readLine();
 		System.out.println(line);
+		if (line.equals("Bad login")) {
+			System.exit(0);
+		}
 		sessionID = line.split(":")[3];
 		
 		wr.close();
@@ -94,7 +101,6 @@ public class Session {
 		}
 		
 		this.player = player;
-		player.session = this;
 		
 		while(socket.isConnected()) {
 			while (reader.available() > 0) {
@@ -377,6 +383,14 @@ public class Session {
 					type = reader.readByte();
 					reader.readByte(); // metadata
 					map.setBlockType(x,y,z,type);
+					break;
+				
+				case PacketID.SoundEffect:
+					reader.readInt();
+					reader.readInt();
+					reader.readByte();
+					reader.readInt();
+					reader.readInt();
 					break;
 					
 				case PacketID.SetSlot:
