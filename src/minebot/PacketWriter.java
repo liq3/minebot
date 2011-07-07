@@ -130,20 +130,3 @@ public final class PacketWriter extends DataOutputStream {
 		/* TODO */
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
