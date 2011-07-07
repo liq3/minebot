@@ -1,15 +1,18 @@
 package minebot;
 
 public class Item {
-	public enum Types{AIR, STONE, GRASS, DIRT, COBBLESTONE}
-	
-	public int type;
+	public int ID;
 	public int count;
-	public int uses;
+	public int data; // damage/metadata, depends on item
 	
-	public Item(int type, int count, int uses) {
-		this.type = type;
+	public Item(int ID, int count, int data) {
+		this.ID = ID;
 		this.count = count;
-		this.uses = uses;
+		this.data = data;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Item: ID=%d, count=%d, data=%d", ID, count, data);
 	}
 }

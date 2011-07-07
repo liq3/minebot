@@ -1,6 +1,6 @@
 package minebot;
 
-public class ItemType {
+public class ItemID {
 
 	public static final int    Air =	0x00;
 	public static final int    Stone =		0x01;

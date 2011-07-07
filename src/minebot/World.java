@@ -6,11 +6,12 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import java.util.*;
 
-public class Map {
-	private HashMap<String, byte[]> chunks;
+
+public final class World {
+	private HashMap<Integer, byte[]> chunks;
 	
-	public Map() {
-		chunks = new HashMap<String, byte[]>();
+	public World() {
+		chunks = new HashMap<Integer, byte[]>();
 	}
 	
 	public void readChunkData(int x, int y, int z, int sx, int sy, int sz, byte[] data) throws IOException {
@@ -43,7 +44,7 @@ public class Map {
 		
 		int cx = (int)(x) >> 4;
 		int cz = (int)(z) >> 4;
-		String key = cx+"."+cz;
+		int key = getKey(cx, cz);
 		if (!chunks.containsKey(key) && size == 16*16*128) {
 			chunks.put(key, blockData);
 		} else if (chunks.containsKey(key)) {
@@ -71,7 +72,7 @@ public class Map {
 		int index = getIndex(x,y,z);
 		int cx = (int)(x) >> 4;
 		int cz = (int)(z) >> 4;
-		String key = getKey(cx, cz);
+		int key = getKey(cx, cz);
 		if (chunks.containsKey(key)) {
 			return chunks.get(key)[index];
 		} else {
@@ -81,7 +82,7 @@ public class Map {
 	}
 	
 	public void setBlockType(int x, int y, int z, int type) {
-		String key = getKey(x >> 4, z >> 4);
+		int key = getKey(x >> 4, z >> 4);
 		if (chunks.containsKey(key)) {
 			chunks.get(key)[getIndex(x,y,z)] = (byte)(type);
 		}
@@ -92,7 +93,7 @@ public class Map {
 	}
 	
 	public void multiBlockChange(int cx, int cz, int len, byte[] coords, byte[] types, byte[] metadata) {
-		String key = getKey(cx,cz);
+		int key = getKey(cx,cz);
 		int[] x = new int[len];
 		int[] y = new int[len];
 		int[] z = new int[len];
@@ -107,7 +108,7 @@ public class Map {
 	}
 	
 	public void createEmptyChunk(int cx, int cz) {
-		String key = getKey(cx, cz);
+		int key = getKey(cx, cz);
 		if (!chunks.containsKey(key)) {
 			byte[] block = new byte[128*16*16];
 			for (int i = 0; i < 128*16*16; i++) {
@@ -121,8 +122,8 @@ public class Map {
 		chunks.remove(getKey(cx,cz));
 	}
 	
-	private String getKey(int cx, int cz) {
-		return new String(cx+"."+cz);
+	private int getKey(int cx, int cz) {
+		return cx + (cz << 16);
 	}
 	
 	public boolean canStand(double x, double y, double z) {		
@@ -130,7 +131,7 @@ public class Map {
 		int b2 = block(x,y,z);
 		int b3 = block(x,y+1,z);
 
-		if (ItemType.solid[b1] && !ItemType.solid[b2] && !ItemType.solid[b3]) {
+		if (ItemID.solid[b1] && !ItemID.solid[b2] && !ItemID.solid[b3]) {
 			return true;
 		}
 		return false;

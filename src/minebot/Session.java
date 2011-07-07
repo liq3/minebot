@@ -3,12 +3,13 @@ package minebot;
 import java.io.*;
 import java.net.*;
 
+
 public class Session {
 	
 	public Player player;
 	public boolean connected;
 	
-	public Map map;
+	public World map;
 	public int EID;
 	
 	public String username;
@@ -27,7 +28,6 @@ public class Session {
 	
 	// Login to minecraft.net
 	public void login() throws IOException {
-		//String loginData = String.format("user=%s&password=%s&version=9001", username, password);
 		String loginData = URLEncoder.encode("user", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
 		loginData += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
 		loginData += "&" + URLEncoder.encode("version", "UTF-8") + "=" + URLEncoder.encode("12", "UTF-8");
@@ -58,7 +58,7 @@ public class Session {
 		reader = new DataInputStream(socket.getInputStream());
 		writer = new PacketWriter(socket.getOutputStream());
 		
-		map = new Map();
+		map = new World();
 		
 		// handshake
 		writer.writeHandshake(username);
@@ -149,7 +149,7 @@ public class Session {
 					
 				case PacketID.HealthUpdate:
 					int hp = reader.readShort();
-					if ( hp <= 0) {
+					if (hp <= 0) {
 						writer.writeRespawn(PacketWriter.DIMENSION_WORLD);
 					}
 					break;
@@ -210,7 +210,7 @@ public class Session {
 					int yaw = reader.readByte();
 					int pitch = reader.readByte();
 					int item = reader.readShort();
-					player.entityList.add(new NamedEntity(EID,new String(buff, 0, len*2, "UTF-16BE"), x,y,z, yaw,pitch, item));
+					player.entityList.add(new NamedEntity(EID, x,y,z, yaw,pitch, new String(buff, 0, len*2, "UTF-16BE"), item));
 					break;
 					
 				case PacketID.SpawnPickup:
@@ -265,7 +265,7 @@ public class Session {
 						for (int i = 0; i < player.entityList.size(); i++) {
 							NamedEntity ent = player.entityList.get(i);
 							if (ent.EID == EID) {
-								ent.moveDelta(dx, dy, dz);
+								ent.move(dx, dy, dz);
 							}
 						}
 					}
@@ -293,7 +293,7 @@ public class Session {
 						for (int i = 0; i < player.entityList.size(); i++) {
 							NamedEntity ent = player.entityList.get(i);
 							if (ent.EID == EID) {
-								ent.moveDelta(dx, dy, dz);
+								ent.move(dx, dy, dz);
 							}
 						}
 					}

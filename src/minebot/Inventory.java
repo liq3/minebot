@@ -1,7 +1,7 @@
 package minebot;
 
 public class Inventory {
-	private Item items[];
+	private Item[] items;
 	public int holdingSlot;
 	
 	public Inventory() {
@@ -19,7 +19,7 @@ public class Inventory {
 		String str = "Items:";
 		for (int i = 0; i < items.length; i ++) {
 			if (items[i] != null) {
-				str += " "+items[i].type;
+				str += " "+items[i].ID;
 			}
 		}
 		System.out.println(str);
@@ -27,7 +27,7 @@ public class Inventory {
 	
 	public int equip(int type) {
 		for (int i = 36; i < 45; i++) {
-			if (items[i] != null && items[i].type == type) {
+			if (items[i] != null && items[i].ID == type) {
 				holdingSlot = i;
 				return i;
 			}

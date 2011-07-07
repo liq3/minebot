@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
+
 public class Player {
 	
 	public int spawnX;
@@ -28,7 +29,7 @@ public class Player {
 	
 	private Session session;
 	private PacketWriter writer;
-	private Map map;
+	private World map;
 	
 	public Player(Session session) throws SecurityException, IOException {
 		spawnX = 0;
@@ -69,7 +70,7 @@ public class Player {
 			
 			writer.writePositionAndLook(this);
 							
-			if (!ItemType.solid[ map.block(x,y-1,z) ] && moveList.isEmpty()) {
+			if (!ItemID.solid[ map.block(x,y-1,z) ] && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						
@@ -119,7 +120,7 @@ public class Player {
 	
 		Item item = inventory.getItem(slot);
 		
-		writer.writeBlockPlacement(x,y,z,0, item.type, item.count, item.uses);
+		writer.writeBlockPlacement(x,y,z,0, item.ID, item.count, item.data);
 	}
 	
 	public void printData() {

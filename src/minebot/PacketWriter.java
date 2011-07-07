@@ -126,7 +126,7 @@ public final class PacketWriter extends DataOutputStream {
 	}
 	public void writeHoldingChange(int slot) throws IOException {
 		writeByte(PacketID.HoldingChange);
-		writeShort((short)slot);
+		writeShort(slot);
 	}
 	public void writeAnimation(int type) throws IOException {
 		writeByte(PacketID.Animation);

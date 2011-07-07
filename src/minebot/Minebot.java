@@ -28,9 +28,9 @@ public class Minebot
 		
 		session = new Session(username, password);
 		session.login();
-		session.connect("localhost", 25565);
+		//session.connect("localhost", 25565);
 		
-		player = new Player(session);
-		session.begin(player);
+		// player = new Player(session);
+		// session.begin(player);
 	}
 }
