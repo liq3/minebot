@@ -2,7 +2,8 @@ package minebot.world;
 
 public class Entity {
 	public int EID;
-	public double x,y,z;
+	public double x, y, z;
+	public double vx, vy, vz;
 	public double yaw, pitch;
 	
 	public Entity() {

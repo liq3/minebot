@@ -6,38 +6,28 @@ import minebot.net.Session;
 
 public class Minebot
 {
-	private static Player player;
+	private static Bot player;
 	private static Session session;
 
 	public static void main(String args[]) throws Exception {
-		BufferedReader fileInput = null;
-		String username = null;
-		String password = null;
+		
 		try {
-			fileInput = new BufferedReader(new FileReader("login.txt"));
-			username = fileInput.readLine();
-			password = fileInput.readLine();
-		} finally {
-			if (fileInput != null) {
-				fileInput.close();
-			}
+			Config.Load("config.txt");
+		} catch (IOException e) {
+			System.out.println("config.txt missing");
 		}
 		
-		if (username == null || password == null) {
-			System.out.println("Invalid login.txt");
-			System.exit(0);
-		}
-		
-		session = new Session(username, password);
+		session = new Session(Config.username, Config.password);
 		session.login();
+
 		try {
-			session.connect("localhost", 25565);
+			session.connect(Config.host, Config.port);
 		} catch (IOException e) {
 			System.out.println(e);
 			System.exit(0);
 		}
-			
-		player = new Player(session);
+
+		player = new Bot(session);
 		session.begin(player);
 	}
 }

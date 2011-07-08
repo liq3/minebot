@@ -1,6 +1,6 @@
 package minebot;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -11,91 +11,55 @@ import minebot.world.ItemID;
 import minebot.world.NamedEntity;
 import minebot.world.World;
 
-
-public class Player {
+public class Player extends NamedEntity {
+	
+	public Inventory inventory;
 	
 	public int spawnX;
 	public int spawnY;
 	public int spawnZ;
-	public double x,y,z;
 	public double stance;
-	public float yaw, pitch;
 	public boolean onGround;
-	private long moveTime;
-	private long lastTick;
+	public boolean digging;
 	public boolean spawned;
-	public int EID;
 	
-	private boolean digging;
-	private int digX, digY, digZ;
+	protected int digX, digY, digZ;
+	protected Session session;
+	protected PacketWriter writer;
+	protected World world;
 	
-	public Inventory inventory;
-	
-	private Queue<Move> moveList;
-	public LinkedList<NamedEntity> entityList;
-	
-	private Session session;
-	private PacketWriter writer;
-	private World map;
-	
-	public Player(Session session) throws SecurityException, IOException {
-		spawnX = 0;
-		spawnY = 0;
-		spawnZ = 0;
-		y = stance = 75.65;
-		x = z = 0;
-		yaw = pitch = 0;
+	public Player(Session session) {
+		super(session.EID, 0, 100, 0, 0, 0, session.username, -1);
+		stance = 100;
 		onGround = true;
-		moveTime = 0;
-		lastTick = System.currentTimeMillis();
 		spawned = false;
 
 		digging = false;
 		digX = digY = digZ = 0;
 		
 		inventory = new Inventory();
-		moveList = new LinkedList<Move>();
-		entityList = new LinkedList<NamedEntity>();
 		
 		this.session = session;
-		this.map = session.map;
+		this.world = session.world;
 		this.writer = session.writer;
-	}
-	
-	public void logic() throws IOException {
-		long tempTime = System.currentTimeMillis();
-		moveTime += tempTime - lastTick;
-		lastTick = tempTime;
-		session.writer.writeKeepAlive();
 		
-		int speed = 450;
-		while (moveTime > speed && spawned) {
-			
-			if (digging && map.block(digX, digY, digZ) == 0) { 
-				digging = false;
-			}
-			
-			writer.writePositionAndLook(this);
-							
-			if (!ItemID.solid[ map.block(x,y-1,z) ] && moveList.isEmpty()) {
-				addMove(0,-1,0);
-			}
-						
-			if (!moveList.isEmpty()) {
-				Move move = moveList.remove();
-
-				x = Math.floor(x+move.x)+0.5;
-				y += move.y;
-				stance += move.y;
-				z = Math.floor(z+move.z)+0.5;
-			}	
-			
-			moveTime -= speed;
-		}
+		world.entities.add(this);
 	}
 	
-	private void addMove(int x, int y, int z) {
-		moveList.add(new Move(x,y,z));
+	@Override
+	public void teleport(int x, int y, int z) {
+		this.x = (double)x/32;
+		this.y = (double)y/32;
+		this.z = (double)z/32;
+		stance = (double)y/32;
+	}
+	
+	@Override
+	public void move(int dx, int dy, int dz) {
+		this.x += (double)dx/32;
+		this.y += (double)dy/32;
+		this.z += (double)dz/32;
+		stance += (double)dy/32;
 	}
 	
 	private void dig(double x, double y, double z) throws IOException {
@@ -116,6 +80,10 @@ public class Player {
 		writer.writeDigging(PacketWriter.DIGGING_END, x,y,z, 4);
 	}
 	
+	public void doneDigging() {
+		digging = false;
+	}
+	
 	private void placeBlock(int type, int x, int y, int z) throws IOException {
 		//System.out.println("Placing block.");
 		int slot = inventory.equip(type);
@@ -130,45 +98,12 @@ public class Player {
 		writer.writeBlockPlacement(x,y,z,0, item.ID, item.count, item.data);
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("Player: EID=%d, x=%f, y=%f, z=%f, stance=%f, spawnX=%d, spawnY=%d, spawnZ=%d", EID, x, y, z, stance, spawnX, spawnY, spawnZ);
+	}
+	
 	public void printData() {
-		System.out.println("Spawn: "+spawnX+" "+spawnY+" "+spawnZ);
-		System.out.println("xyzStance: "+ x +" "+y+" "+z+" "+stance);
+		System.out.println(toString());
 	}
-	
-	public void doneDigging() {
-		digging = false;
-	}
-	
-	public void handleChat(String msg) {
-		System.out.println(msg);
-		String name = msg.substring(0,7);
-		String cmd = msg.substring(7);
-		if (name.equals("<liq3> ") && cmd.equals("move")) {
-			NamedEntity ent = null; 
-			for (int i = 0; i < entityList.size(); i++) {
-				if (entityList.get(i).name.equals("liq3")) {
-					ent = entityList.get(i);
-					break;
-				}
-			}
-			if (ent != null) {
-				System.out.println("Starting path. Start:"+x+","+y+","+z+" End:"+ent.x+","+ent.y+","+ent.z);
-				AStar AStarPath = new AStar(map);
-				PathBlock[] path = AStarPath.getPath(Math.floor(x),Math.floor(y),Math.floor(z), Math.floor(ent.x), Math.floor(ent.y), Math.floor(ent.z));
-				if (path == null) {
-					System.out.println("No path.");
-					return;
-				}
-				System.out.println("Found path!");
-				for (int i = path.length-1; i > 0; i--) {
-					System.out.println("Node: "+path[i].x+" "+path[i].y+" "+path[i].z);
-					addMove(path[i-1].x - path[i].x, path[i-1].y - path[i].y, path[i-1].z - path[i].z);
-				}				
-			}
-		}
-	}
-	
-
-	
-	
 }

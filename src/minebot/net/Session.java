@@ -3,17 +3,18 @@ package minebot.net;
 import java.io.*;
 import java.net.*;
 
-import minebot.Player;
+import minebot.Bot;
+import minebot.world.Entity;
 import minebot.world.NamedEntity;
 import minebot.world.World;
 
 
 public class Session {
 	
-	public Player player;
+	public Bot player;
 	public boolean connected;
 	
-	public World map;
+	public World world;
 	public int EID;
 	
 	public String username;
@@ -62,7 +63,7 @@ public class Session {
 		reader = new DataInputStream(socket.getInputStream());
 		writer = new PacketWriter(socket.getOutputStream());
 		
-		map = new World();
+		world = new World();
 		
 		// handshake
 		writer.writeHandshake(username);
@@ -98,7 +99,7 @@ public class Session {
 	}
 	
 	// Bind player and session instances and then begin work
-	public void begin(Player player) throws IOException, InterruptedException {
+	public void begin(Bot player) throws IOException, InterruptedException {
 		if (!connected) {
 			System.out.println("You need to connect to a server first.");
 			System.exit(0);
@@ -127,11 +128,17 @@ public class Session {
 			//System.out.println("op:"+Integer.toHexString(opcode));
 			int x, y, z, dx, dy, dz, len, type, EID;
 			byte[] metadata;
+			Entity e;
 			switch (opcode) {
+				case PacketID.KeepAlive:
+					writer.writeKeepAlive();
+					break;
+					
 				case PacketID.ChatMessage:
 					len = reader.readShort();
 					reader.read(buff, 0, len*2);
-					player.handleChat(new String(buff, 0, len*2, "UTF-16BE"));
+					String str = new String(buff, 0, len*2, "UTF-16BE");
+					player.handleChat(str);
 					break;
 					
 				case PacketID.TimeUpdate:
@@ -214,7 +221,7 @@ public class Session {
 					int yaw = reader.readByte();
 					int pitch = reader.readByte();
 					int item = reader.readShort();
-					player.entityList.add(new NamedEntity(EID, x,y,z, yaw,pitch, new String(buff, 0, len*2, "UTF-16BE"), item));
+					world.entities.add(new NamedEntity(EID, x,y,z, yaw,pitch, new String(buff, 0, len*2, "UTF-16BE"), item));
 					break;
 					
 				case PacketID.SpawnPickup:
@@ -252,20 +259,19 @@ public class Session {
 					break;
 				
 				case PacketID.EntityVelocity:
-					reader.readInt();
+					EID = reader.readInt();
 					reader.readShort();
 					reader.readShort();
 					reader.readShort();
 					break;
-				
+					
 				case PacketID.DestroyEntity:
 					EID = reader.readInt();
-					for (int i = 0; i < player.entityList.size(); i++) {
-						if (player.entityList.get(i).EID == EID) {
-							player.entityList.remove(i);
-							break;
-						}
-					}
+					world.entities.remove(EID);
+					break;
+					
+				case PacketID.Entity:
+					reader.readInt();
 					break;
 					
 				case PacketID.EntityRelMove:
@@ -273,18 +279,9 @@ public class Session {
 					dx = reader.readByte();
 					dy = reader.readByte();
 					dz = reader.readByte();
-					if (EID == player.EID) {
-						player.x += (double)dx/32;
-						player.y += (double)dy/32;
-						player.stance += (double)dy/32;
-						player.z += (double)dz/32;
-					} else {
-						for (int i = 0; i < player.entityList.size(); i++) {
-							NamedEntity ent = player.entityList.get(i);
-							if (ent.EID == EID) {
-								ent.move(dx, dy, dz);
-							}
-						}
+					e = world.entities.get(EID);
+					if (e != null) {
+						e.move(dx, dy, dz);
 					}
 					break;
 					
@@ -301,18 +298,9 @@ public class Session {
 					dz = reader.readByte();
 					reader.readByte();
 					reader.readByte();
-					if (EID == player.EID) {
-						player.x += (double)dx/32;
-						player.y += (double)dy/32;
-						player.stance += (double)dy/32;
-						player.z += (double)dz/32;
-					} else {
-						for (int i = 0; i < player.entityList.size(); i++) {
-							NamedEntity ent = player.entityList.get(i);
-							if (ent.EID == EID) {
-								ent.move(dx, dy, dz);
-							}
-						}
+					e = world.entities.get(EID);
+					if (e != null) {
+						e.move(dx, dy, dz);
 					}
 					break;
 					
@@ -323,18 +311,9 @@ public class Session {
 					z = reader.readInt();
 					reader.readByte();
 					reader.readByte();
-					if (EID == player.EID) {
-						player.x = (double)x/32;
-						player.y = (double)y/32;
-						player.stance = (double)y/32 + 1.62;
-						player.z = (double)z/32;
-					} else {
-						for (int i = 0; i < player.entityList.size(); i++) {
-							NamedEntity ent = player.entityList.get(i);
-							if (ent.EID == EID) {
-								ent.teleport(x, y, z);
-							}
-						}
+					e = world.entities.get(EID);
+					if (e != null) {
+						e.teleport(x, y, z);
 					}
 					break;
 					
@@ -356,11 +335,11 @@ public class Session {
 				case PacketID.ChunkAction:
 					int cx = reader.readInt();
 					int cz = reader.readInt();
-					boolean mode = reader.readBoolean();
-					if (mode) {
-						map.createEmptyChunk(cx, cz);
+					boolean create = reader.readBoolean();
+					if (create) {
+						world.createEmptyChunk(cx, cz);
 					} else {
-						map.deleteChunk(cx, cz);
+						world.deleteChunk(cx, cz);
 					}
 					break;
 					
@@ -377,7 +356,7 @@ public class Session {
 					while (recv < size) {
 						recv += reader.read(data, recv, size-recv);
 					}
-					map.readChunkData(x,y,z,sx,sy,sz,data);
+					world.readChunkData(x,y,z,sx,sy,sz,data);
 					break;
 					
 				case PacketID.MultiBlockChange:
@@ -390,7 +369,7 @@ public class Session {
 					reader.read(coords, 0, len*2);
 					reader.read(types, 0, len);					
 					reader.read(metadata, 0, len);
-					map.multiBlockChange(chunkX, chunkZ, len, coords, types, metadata);
+					// world.multiBlockChange(chunkX, chunkZ, len, coords, types, metadata);
 					break;
 					
 				case PacketID.BlockChange:
@@ -399,7 +378,7 @@ public class Session {
 					z = reader.readInt();
 					type = reader.readByte();
 					reader.readByte(); // metadata
-					map.setBlockType(x,y,z,type);
+					world.setBlockType(x,y,z,type);
 					break;
 				
 				case PacketID.SoundEffect:
@@ -456,14 +435,13 @@ public class Session {
 					reader.read(buff, 0, len*2);
 					System.out.println("Kick: "+ new String(buff, "UTF-16BE"));
 					System.exit(0);
-					break;
 	 					
 				default: {
 					reader.read(buff);
 					System.out.println("Unknown opcode: "+ Integer.toHexString(opcode) + "|"+opcode);
 					System.out.println("Last opcode:"+Integer.toHexString(lastOpcode));
-					System.out.println("Quitting.");
-					System.exit(0);
+					// System.out.println("Quitting.");
+					// System.exit(0);
 					break;
 				}
 			}
@@ -487,7 +465,7 @@ public class Session {
 			case 5:
 			case 6:
 				System.out.println("Op 0x18 non case 0.");
-				System.exit(0);
+				// System.exit(0);
 			}
 			x = reader.readByte();
 		}

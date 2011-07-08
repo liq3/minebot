@@ -30,6 +30,7 @@ public final class PacketID {
 	public static final int SpawnMob			= 0x18;
 	public static final int EntityVelocity      = 0x1C;
 	public static final int DestroyEntity		= 0x1D;
+	public static final int Entity				= 0x1E;
 	public static final int EntityRelMove		= 0x1F;
 	public static final int EntityLook			= 0x20;
 	public static final int EntityRelMoveLook	= 0x21;
