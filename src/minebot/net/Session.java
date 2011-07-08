@@ -250,9 +250,22 @@ public class Session {
 					reader.readByte();
 					readMetadata();
 					break;
-					
-				case PacketID.DestroyEntity:
+				
+				case PacketID.EntityVelocity:
 					reader.readInt();
+					reader.readShort();
+					reader.readShort();
+					reader.readShort();
+					break;
+				
+				case PacketID.DestroyEntity:
+					EID = reader.readInt();
+					for (int i = 0; i < player.entityList.size(); i++) {
+						if (player.entityList.get(i).EID == EID) {
+							player.entityList.remove(i);
+							break;
+						}
+					}
 					break;
 					
 				case PacketID.EntityRelMove:
@@ -396,7 +409,11 @@ public class Session {
 					reader.readInt();
 					reader.readInt();
 					break;
-					
+				
+				case PacketID.NewState:
+					reader.readByte();
+					break;
+				
 				case PacketID.SetSlot:
 					reader.readByte();
 					int slot = reader.readShort();
@@ -440,8 +457,7 @@ public class Session {
 					System.out.println("Kick: "+ new String(buff, "UTF-16BE"));
 					System.exit(0);
 					break;
-	 				
-				// We don't care about these yet. All of these are silently ignored. 			
+	 					
 				default: {
 					reader.read(buff);
 					System.out.println("Unknown opcode: "+ Integer.toHexString(opcode) + "|"+opcode);

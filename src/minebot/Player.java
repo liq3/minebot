@@ -68,7 +68,7 @@ public class Player {
 		lastTick = tempTime;
 		session.writer.writeKeepAlive();
 		
-		int speed = 50;
+		int speed = 450;
 		while (moveTime > speed && spawned) {
 			
 			if (digging && map.block(digX, digY, digZ) == 0) { 

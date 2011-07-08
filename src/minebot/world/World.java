@@ -9,7 +9,7 @@ import java.util.*;
 
 
 public final class World {
-	private HashMap<Integer, byte[]> chunks;
+	private Map<Integer, byte[]> chunks;
 	
 	public World() {
 		chunks = new HashMap<Integer, byte[]>();
@@ -64,18 +64,13 @@ public final class World {
 	
 	public int block(double x, double y, double z) {
 		x = Math.floor(x);
-		y = Math.floor(y);
 		z = Math.floor(z);
 		return block((int)x, (int)y, (int)z);
 	}
 		
 	public int block(int x, int y, int z) {
-		int index = getIndex(x,y,z);
-		int cx = (int)(x) >> 4;
-		int cz = (int)(z) >> 4;
-		int key = getKey(cx, cz);
-		if (chunks.containsKey(key)) {
-			return chunks.get(key)[index];
+		if (chunks.containsKey(getKey(x >> 4, z >> 4))) {
+			return chunks.get(getKey(x >> 4, z >> 4))[getIndex(x,y,z)];
 		} else {
 			//System.out.println("Chunk doesn't exist."+x+" "+y+" "+z+" "+cx+" "+cz);
 			return 0;
@@ -127,7 +122,14 @@ public final class World {
 		return cx + (cz << 16);
 	}
 	
-	public boolean canStand(double x, double y, double z) {		
+	public boolean canStand(double x, double y, double z) {
+		x = Math.floor(x);
+		z = Math.floor(z);
+		
+		return canStand((int)x, (int)y, (int)z);
+	}
+	
+	public boolean canStand(int x, int y, int z) {		
 		int b1 = block(x,y-1,z);
 		int b2 = block(x,y,z);
 		int b3 = block(x,y+1,z);

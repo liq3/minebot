@@ -1,12 +1,12 @@
 package minebot;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class AStarList {
-	private Vector<PathBlock> list;
+	protected ArrayList<PathBlock> list;
 	
 	public AStarList() {
-		list = new Vector<PathBlock>();
+		list = new ArrayList<PathBlock>();
 	}
 	
 	public void add(PathBlock b) {
@@ -27,51 +27,23 @@ public class AStarList {
 		return false;
 	}
 	
-	public PathBlock pop() {
-		return list.remove(0);
+	public PathBlock get(int i) {
+		return list.get(i);
 	}
 	
-	public void quicksort() {
-		quicksort(0, list.size()-1);
-	}
-	
-	private void quicksort(int left, int right) {
-		int index = partition(left, right);
-		if (left < index -1) {
-			quicksort(left, index-1);
-		}
-		if (index < right) {
-			quicksort(index, right);
-		}
-	}
-	
-	private int partition(int left, int right) {
-		int i = left, j = right;
-		PathBlock temp;
-		int pivot = list.get((left+right)/2).f;
-		
-		while (i <= j) {
-			while (list.get(i).f < pivot) 
-				i++;
-			while (list.get(j).f > pivot)
-				j--;
-			if	(i <= j) {
-				temp = list.get(i);
-				list.set(i, list.get(j));
-				list.set(j, temp);
-				i++;
-				j--;
-			}
-		}
-		
-		return i;
+	public PathBlock remove(int i) {
+		return list.remove(i);
 	}
 	
 	public boolean isEmpty() {
 		return list.isEmpty();
 	}
 	
-	public PathBlock last() {
-		return list.lastElement();
+	public void set(int i, PathBlock b) {
+		list.set(i, b);
+	}
+	
+	public int size() {
+		return list.size();
 	}
 }

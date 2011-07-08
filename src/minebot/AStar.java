@@ -3,7 +3,6 @@ package minebot;
 import minebot.world.ItemID;
 import minebot.world.World;
 
-
 public class AStar {
 	
 	private World map;
@@ -23,18 +22,18 @@ public class AStar {
 		}
 		
 		AStarList closed = new AStarList();
-		AStarList open = new AStarList();
+		AStarBinaryHeap open = new AStarBinaryHeap();
 		
 		open.add(new PathBlock(sx, sy, sz, dx, dy, dz, null));
 		
 		while (true) {
-			open.quicksort();
+			
 			PathBlock block = open.pop();
 			closed.add(block);
 			
 			if (closed.contains(dx,dy,dz)) {
 				int count = 1; // Include the origin
-				block = closed.last();
+				block = closed.get(closed.size()-1);
 				while (block.parent != null) {
 					block = block.parent;
 					count++;
@@ -42,7 +41,7 @@ public class AStar {
 				
 				PathBlock[] blockList = new PathBlock[count];
 				count = 0;
-				block = closed.last();
+				block = closed.get(closed.size()-1);
 				while (block.parent != null) {
 					blockList[count] = block;
 					block = block.parent;

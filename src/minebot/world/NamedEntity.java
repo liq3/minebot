@@ -6,6 +6,7 @@ public class NamedEntity extends Entity {
 	public int currentItem;
 	
 	public NamedEntity(int EID, int x, int y, int z, int yaw, int pitch, String name, int currentItem) {
+		this.EID = EID;
 		this.name = name;
 		this.currentItem = currentItem;
 		teleport(x, y, z);
