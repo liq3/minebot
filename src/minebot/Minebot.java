@@ -6,7 +6,7 @@ import minebot.net.Session;
 
 public class Minebot
 {
-	private static Bot player;
+	private static Bot bot;
 	private static Session session;
 
 	public static void main(String args[]) throws Exception {
@@ -22,7 +22,7 @@ public class Minebot
 		session.login();
 		session.connect(Config.host, Config.port);
 
-		player = new Bot(session);
-		session.begin(player);
+		bot = new Bot(session);
+		session.begin();
 	}
 }

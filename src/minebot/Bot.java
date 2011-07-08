@@ -22,6 +22,7 @@ public class Bot extends Player{
 		moveList = new LinkedList<Move>();
 	}
 	
+	@Override
 	public void logic() throws IOException {
 		long tempTime = System.currentTimeMillis();
 		moveTime += tempTime - lastTick;
@@ -57,6 +58,7 @@ public class Bot extends Player{
 		moveList.add(new Move(x,y,z));
 	}
 	
+	@Override
 	public void handleChat(String msg) {
 		System.out.println(msg);
 		if (msg.charAt(0) != '<') {

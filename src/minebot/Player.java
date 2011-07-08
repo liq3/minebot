@@ -5,7 +5,7 @@ import java.io.IOException;
 import minebot.net.*;
 import minebot.world.*;
 
-public class Player extends NamedEntity {
+public abstract class Player extends NamedEntity {
 	
 	public Inventory inventory;
 	
@@ -38,7 +38,11 @@ public class Player extends NamedEntity {
 		this.writer = session.writer;
 		
 		world.entities.add(this);
+		session.player = this;
 	}
+	
+	public abstract void logic() throws IOException;
+	public abstract void handleChat(String chat);
 	
 	@Override
 	public void teleport(int x, int y, int z) {

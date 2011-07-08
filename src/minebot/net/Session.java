@@ -3,13 +3,13 @@ package minebot.net;
 import java.io.*;
 import java.net.*;
 
-import minebot.Bot;
+import minebot.*;
 import minebot.world.*;
 
 
 public class Session {
 	
-	public Bot player;
+	public Player player;
 	public boolean connected;
 	
 	public World world;
@@ -52,23 +52,19 @@ public class Session {
 		reader = new DataInputStream(socket.getInputStream());
 		writer = new PacketWriter(socket.getOutputStream());
 		
-		// handshake
 		writer.writeHandshake(username);
 		readPacket();
 		
-		// login request
 		writer.writeLoginRequest(username);
 		readPacket();
 	}
 	
-	// Bind player and session instances and then begin work
-	public void begin(Bot player) throws IOException, InterruptedException {
+	// Start listening to packets and running the Player instance
+	public void begin() throws IOException, InterruptedException {
 		if (!connected) {
 			System.out.println("You need to connect to a server first.");
 			System.exit(0);
 		}
-		
-		this.player = player;
 		
 		while(socket.isConnected()) {
 			while (reader.available() > 0) {
@@ -83,10 +79,10 @@ public class Session {
 		return reader.readUTF();
 	}
 	public String readString16() throws Exception {
-		int len = reader.readShort();
-		byte[] buff = new byte[len*2];
-		reader.read(buff, 0, len*2);
-		return new String(buff, 0, len*2, "UTF-16BE");
+		int len = reader.readShort()*2;
+		byte[] buff = new byte[len];
+		reader.read(buff, 0, len);
+		return new String(buff, 0, len, "UTF-16BE");
 	}
 	
 	public void readMetadata() throws IOException {
@@ -262,7 +258,7 @@ public class Session {
 				world.entities.add(ent);
 				break;
 			}
-			case PacketID.Painting: {// TODO
+			case PacketID.Painting: { // TODO
 				int EID = reader.readInt();
 				readString16();
 				reader.skipBytes(16);
