@@ -28,6 +28,8 @@ public final class PacketID {
 	public static final int CollectItem			= 0x16;
 	public static final int SpawnObject			= 0x17;
 	public static final int SpawnMob			= 0x18;
+	public static final int Painting			= 0x19;
+	public static final int StanceUpdate		= 0x1B;
 	public static final int EntityVelocity      = 0x1C;
 	public static final int DestroyEntity		= 0x1D;
 	public static final int Entity				= 0x1E;
@@ -42,12 +44,21 @@ public final class PacketID {
 	public static final int ChunkLoad			= 0x33;
 	public static final int MultiBlockChange	= 0x34;
 	public static final int BlockChange			= 0x35;
+	public static final int BlockAction			= 0x36;
+	public static final int Explosion			= 0x3C;
 	public static final int SoundEffect         = 0x3D;
 	public static final int NewState			= 0x46;
+	public static final int Thunderbolt			= 0x47;
+	public static final int OpenWindow			= 0x64;
+	public static final int CloseWindow			= 0x65;
 	public static final int WindowClick			= 0x66;
 	public static final int SetSlot				= 0x67;
 	public static final int WindowItem			= 0x68;
+	public static final int UpdateProgressBar	= 0x69;
 	public static final int Transaction			= 0x6A;
+	public static final int UpdateSign			= 0x82;
+	public static final int MapData				= 0x83;
+	public static final int IncrementStatistic	= 0xC8;
 	public static final int Kick				= 0xFF;
 	
 }
