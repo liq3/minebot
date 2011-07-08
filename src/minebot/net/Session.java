@@ -3,7 +3,7 @@ package minebot.net;
 import java.io.*;
 import java.net.*;
 
-import minebot.Player;
+import minebot.Bot;
 import minebot.world.Entity;
 import minebot.world.NamedEntity;
 import minebot.world.World;
@@ -11,7 +11,7 @@ import minebot.world.World;
 
 public class Session {
 	
-	public Player player;
+	public Bot player;
 	public boolean connected;
 	
 	public World world;
@@ -99,7 +99,7 @@ public class Session {
 	}
 	
 	// Bind player and session instances and then begin work
-	public void begin(Player player) throws IOException, InterruptedException {
+	public void begin(Bot player) throws IOException, InterruptedException {
 		if (!connected) {
 			System.out.println("You need to connect to a server first.");
 			System.exit(0);
@@ -128,6 +128,7 @@ public class Session {
 			//System.out.println("op:"+Integer.toHexString(opcode));
 			int x, y, z, dx, dy, dz, len, type, EID;
 			byte[] metadata;
+			Entity e;
 			switch (opcode) {
 				case PacketID.KeepAlive:
 					writer.writeKeepAlive();
@@ -277,16 +278,9 @@ public class Session {
 					dx = reader.readByte();
 					dy = reader.readByte();
 					dz = reader.readByte();
-					if (EID == player.EID) {
-						player.x += (double)dx/32;
-						player.y += (double)dy/32;
-						player.stance += (double)dy/32;
-						player.z += (double)dz/32;
-					} else {
-						Entity e = world.entities.get(EID);
-						if (e != null) {
-							e.move(dx, dy, dz);
-						}
+					e = world.entities.get(EID);
+					if (e != null) {
+						e.move(dx, dy, dz);
 					}
 					break;
 					
@@ -303,16 +297,9 @@ public class Session {
 					dz = reader.readByte();
 					reader.readByte();
 					reader.readByte();
-					if (EID == player.EID) {
-						player.x += (double)dx/32;
-						player.y += (double)dy/32;
-						player.stance += (double)dy/32;
-						player.z += (double)dz/32;
-					} else {
-						Entity e = world.entities.get(EID);
-						if (e != null) {
-							e.move(dx, dy, dz);
-						}
+					e = world.entities.get(EID);
+					if (e != null) {
+						e.move(dx, dy, dz);
 					}
 					break;
 					
@@ -323,16 +310,9 @@ public class Session {
 					z = reader.readInt();
 					reader.readByte();
 					reader.readByte();
-					if (EID == player.EID) {
-						player.x = (double)x/32;
-						player.y = (double)y/32;
-						player.stance = (double)y/32 + 1.62;
-						player.z = (double)z/32;
-					} else {
-						Entity e = world.entities.get(EID);
-						if (e != null) {
-							e.teleport(x, y, z);
-						}
+					e = world.entities.get(EID);
+					if (e != null) {
+						e.teleport(x, y, z);
 					}
 					break;
 					

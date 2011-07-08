@@ -2,7 +2,7 @@ package minebot.net;
 
 import java.io.*;
 
-import minebot.Player;
+import minebot.Bot;
 
 public final class PacketWriter extends DataOutputStream {
 	public static final int PROTOCOL_VERSION = 14;
@@ -26,6 +26,9 @@ public final class PacketWriter extends DataOutputStream {
 	public PacketWriter(OutputStream outputStream) {
 		super(outputStream);
 	}
+	public void writeKeepAlive() throws IOException {
+		writeByte(PacketID.KeepAlive);
+	}
 	public void writeString8(String str) throws IOException{
 		writeUTF(str);
 	}
@@ -33,11 +36,6 @@ public final class PacketWriter extends DataOutputStream {
 		writeShort(str.length());
 		write(str.getBytes("UTF-16BE"), 0, str.length()*2);
 	}
-	
-	public void writeKeepAlive() throws IOException {
-		writeByte(PacketID.KeepAlive);
-	}
-	
 	public void writeLoginRequest(String username) throws IOException {
 		writeByte(PacketID.LoginRequest);
 		writeInt(PROTOCOL_VERSION);
@@ -65,7 +63,7 @@ public final class PacketWriter extends DataOutputStream {
 		writeByte(PacketID.OnGround);
 		writeBoolean(onGround);
 	}
-	public void writePosition(Player player) throws IOException {
+	public void writePosition(Bot player) throws IOException {
 		writeByte(PacketID.Position);
 		writeDouble(player.x);
 		writeDouble(player.y);
@@ -73,20 +71,20 @@ public final class PacketWriter extends DataOutputStream {
 		writeDouble(player.z);
 		writeBoolean(player.onGround);
 	}
-	public void writeLook(Player player) throws IOException {
+	public void writeLook(Bot player) throws IOException {
 		writeByte(PacketID.Look);
-		writeFloat(player.yaw);
-		writeFloat(player.pitch);
+		writeFloat((float)player.yaw);
+		writeFloat((float)player.pitch);
 		writeBoolean(player.onGround);
 	}
-	public void writePositionAndLook(Player player) throws IOException {
+	public void writePositionAndLook(Bot player) throws IOException {
 		writeByte(PacketID.PositionAndLook);
 		writeDouble(player.x);
 		writeDouble(player.y);
 		writeDouble(player.stance);
 		writeDouble(player.z);
-		writeFloat(player.yaw);
-		writeFloat(player.pitch);
+		writeFloat((float)player.yaw);
+		writeFloat((float)player.pitch);
 		writeBoolean(player.onGround);
 	}
 	
@@ -132,10 +130,10 @@ public final class PacketWriter extends DataOutputStream {
 	}
 	public void writeAnimation(int type) throws IOException {
 		writeByte(PacketID.Animation);
-		writeInt(0); // is this actually needed?
+		/* TODO */
 	}
-	
 	public void writeWindowClick() throws IOException {
+		writeByte(PacketID.WindowClick);
 		/* TODO */
 	}
 }
