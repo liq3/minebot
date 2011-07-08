@@ -15,7 +15,7 @@ public final class PacketWriter extends DataOutputStream {
 	public static final int DIGGING_BEGIN = 0;
 	public static final int DIGGING_END   = 2;
 	
-	// WindowClick
+	// Window
 	public static final int WINDOW_CHEST	 = 0;
 	public static final int WINDOW_WORKBENCH = 1;
 	public static final int WINDOW_FURNACE	 = 2;
@@ -51,8 +51,11 @@ public final class PacketWriter extends DataOutputStream {
 		writeByte(PacketID.ChatMessage);
 		writeString16(str);
 	}
-	public void writeUseEntity(int entity, boolean leftClick) throws IOException {
+	public void writeUseEntity(int target, boolean leftClick) throws IOException {
 		writeByte(PacketID.UseEntity);
+		writeInt(0);
+		writeInt(target);
+		writeBoolean(leftClick);
 	}
 	
 	public void writeRespawn(int worldType) throws IOException {

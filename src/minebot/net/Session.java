@@ -105,7 +105,7 @@ public class Session {
 		}
 	}
 	
-	private int lastOpcode = 0;
+	private int lastOpcode = -1;
 	
 	public void readPacket() {
 		int opcode = -1;
