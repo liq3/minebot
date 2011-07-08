@@ -264,7 +264,8 @@ public class Session {
 					break;
 					
 				case PacketID.DestroyEntity:
-					reader.readInt();
+					EID = reader.readInt();
+					world.entities.remove(EID);
 					break;
 					
 				case PacketID.Entity:
@@ -385,7 +386,11 @@ public class Session {
 					reader.readInt();
 					reader.readInt();
 					break;
-					
+				
+				case PacketID.NewState:
+					reader.readByte();
+					break;
+				
 				case PacketID.SetSlot:
 					reader.readByte();
 					int slot = reader.readShort();
@@ -428,16 +433,15 @@ public class Session {
 					reader.read(buff, 0, len*2);
 					System.out.println("Kick: "+ new String(buff, "UTF-16BE"));
 					System.exit(0);
-					break;
-	 				
-				// We don't care about these yet. All of these are silently ignored. 			
-				default:
+	 					
+				default: {
 					reader.read(buff);
 					System.out.println("Unknown opcode: "+ Integer.toHexString(opcode) + "|"+opcode);
 					System.out.println("Last opcode:"+Integer.toHexString(lastOpcode));
 					// System.out.println("Quitting.");
 					// System.exit(0);
 					break;
+				}
 			}
 		} catch (IOException e) {
 			System.out.println("Recorded opcode: " + opcode);

@@ -20,8 +20,14 @@ public class Minebot
 		
 		session = new Session(Config.username, Config.password);
 		session.login();
-		session.connect(Config.host, Config.port);
-		
+
+		try {
+			session.connect(Config.host, Config.port);
+		} catch (IOException e) {
+			System.out.println(e);
+			System.exit(0);
+		}
+
 		player = new Bot(session);
 		session.begin(player);
 	}
