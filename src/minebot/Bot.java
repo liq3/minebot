@@ -4,12 +4,8 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import minebot.net.PacketWriter;
-import minebot.net.Session;
-import minebot.world.Item;
-import minebot.world.ItemID;
-import minebot.world.NamedEntity;
-import minebot.world.World;
+import minebot.net.*;
+import minebot.world.*;
 
 
 public class Bot extends Player{

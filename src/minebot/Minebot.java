@@ -15,6 +15,7 @@ public class Minebot
 			Config.Load("config.txt");
 		} catch (IOException e) {
 			System.out.println("config.txt missing");
+			System.exit(0);
 		}
 		
 		session = new Session(Config.username, Config.password);

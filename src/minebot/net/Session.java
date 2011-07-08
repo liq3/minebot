@@ -4,9 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import minebot.Bot;
-import minebot.world.Entity;
-import minebot.world.NamedEntity;
-import minebot.world.World;
+import minebot.world.*;
 
 
 public class Session {
