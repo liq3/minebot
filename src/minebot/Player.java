@@ -32,11 +32,10 @@ public class Player {
 	public Inventory inventory;
 	
 	private Queue<Move> moveList;
-	public LinkedList<NamedEntity> entityList;
 	
 	private Session session;
 	private PacketWriter writer;
-	private World map;
+	private World world;
 	
 	public Player(Session session) throws SecurityException, IOException {
 		spawnX = 0;
@@ -55,10 +54,9 @@ public class Player {
 		
 		inventory = new Inventory();
 		moveList = new LinkedList<Move>();
-		entityList = new LinkedList<NamedEntity>();
 		
 		this.session = session;
-		this.map = session.map;
+		this.world = session.world;
 		this.writer = session.writer;
 	}
 	
@@ -71,13 +69,13 @@ public class Player {
 		int speed = 50;
 		while (moveTime > speed && spawned) {
 			
-			if (digging && map.block(digX, digY, digZ) == 0) { 
+			if (digging && world.block(digX, digY, digZ) == 0) { 
 				digging = false;
 			}
 			
 			writer.writePositionAndLook(this);
 							
-			if (!ItemID.solid[ map.block(x,y-1,z) ] && moveList.isEmpty()) {
+			if (!ItemID.solid[ world.block(x,y-1,z) ] && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						
@@ -141,19 +139,14 @@ public class Player {
 	
 	public void handleChat(String msg) {
 		System.out.println(msg);
-		String name = msg.substring(0,7);
-		String cmd = msg.substring(7);
-		if (name.equals("<liq3> ") && cmd.equals("move")) {
-			NamedEntity ent = null; 
-			for (int i = 0; i < entityList.size(); i++) {
-				if (entityList.get(i).name.equals("liq3")) {
-					ent = entityList.get(i);
-					break;
-				}
-			}
+		String[] name_msg = msg.split("> ", 2);
+		String name = name_msg[0].substring(1);
+		String cmd = name_msg[1];
+		if (name.equals(Config.master) && cmd.equals("move")) {
+			NamedEntity ent = world.entities.getByName(Config.master);
 			if (ent != null) {
 				System.out.println("Starting path. Start:"+x+","+y+","+z+" End:"+ent.x+","+ent.y+","+ent.z);
-				AStar AStarPath = new AStar(map);
+				AStar AStarPath = new AStar(world);
 				PathBlock[] path = AStarPath.getPath(Math.floor(x),Math.floor(y),Math.floor(z), Math.floor(ent.x), Math.floor(ent.y), Math.floor(ent.z));
 				if (path == null) {
 					System.out.println("No path.");

@@ -9,10 +9,14 @@ import java.util.*;
 
 
 public final class World {
+	
+	public EntityManager entities;
+	
 	private HashMap<Integer, byte[]> chunks;
 	
 	public World() {
 		chunks = new HashMap<Integer, byte[]>();
+		entities = new EntityManager();
 	}
 	
 	public void readChunkData(int x, int y, int z, int sx, int sy, int sz, byte[] data) throws IOException {
