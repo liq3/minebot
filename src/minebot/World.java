@@ -13,29 +13,68 @@ public final class World {
 	
 	public final class Chunk {
 		public int cx, cz;
-		public byte[] blocks;
 		
-		public Chunk(int cx, int cz, byte[] blocks) {
+		public byte[] blocks;
+		// extra data is expanded from nibbles to bytes for simplicity
+		public byte[] metadata;
+		public byte[] lightdata;
+		public byte[] skylightdata;
+		
+		public Chunk(int cx, int cz) {
 			this.cx = cx;
 			this.cz = cz;
-			this.blocks = blocks;
-			if (blocks.length != 16*16*128) {
-				System.out.println("Some sort of bug with creation of chunks");
-			}
-		}
-		
-		public void setBlock(int x, int y, int z, int type) {
-			blocks[(x&15)*128*16 + (z&15)*128 + (y&127)] = (byte)type;
+			blocks = new byte[CHUNK_SIZE];
+			metadata = new byte[CHUNK_SIZE];
+			lightdata = new byte[CHUNK_SIZE];
+			skylightdata = new byte[CHUNK_SIZE];
 		}
 		
 		public int getBlock(int x, int y, int z) {
-			return blocks[(x&15)*128*16 + (z&15)*128 + (y&127)]; 
+			return blocks[GetIndex(x, y, z)]; 
+		}
+		
+		public void setBlock(int x, int y, int z, int type) {
+			blocks[GetIndex(x, y, z)] = (byte)type;
+		}
+		
+		public int getBlockData(int x, int y, int z) {
+			return metadata[GetIndex(x, y, z)];
+		}
+		
+		public void setBlockData(int x, int y, int z, int data) {
+			metadata[GetIndex(x, y, z)] = (byte)(data&15);
+		}
+		
+		public int getBlockLight(int x, int y, int z) {
+			return lightdata[GetIndex(x, y, z)];
+		}
+		
+		public void setBlockLight(int x, int y, int z, int value) {
+			lightdata[GetIndex(x, y, z)] = (byte)(value&15);
+		}
+		
+		public int getBlockSkyLight(int x, int y, int z) {
+			return lightdata[GetIndex(x, y, z)];
+		}
+		
+		public void setBlockSkyLight(int x, int y, int z, int value) {
+			lightdata[GetIndex(x, y, z)] = (byte)(value&15);
 		}
 	}
 	
-	public static int GetKey(int cx, int cz) {
+	private static int GetKey(int cx, int cz) {
 		return cx + (cz << 16);
 	}
+	
+	private static int GetIndex(int x, int y, int z) {
+		return ((x&15)<<11) + ((z&15)<<7) + (y&127);
+	}
+	
+	public static int CHUNK_SIZE = 16*16*128;
+	
+	private static int METADATA_OFFSET = CHUNK_SIZE;
+	private static int LIGHTDATA_OFFSET = METADATA_OFFSET + CHUNK_SIZE/2;
+	private static int SKYLIGHTDATA_OFFSET = LIGHTDATA_OFFSET + CHUNK_SIZE/2;
 	
 	public Map<Integer, Chunk> chunks;
 	public EntityManager entities;
@@ -45,45 +84,68 @@ public final class World {
 		entities = new EntityManager();
 	}
 	
-	public void readChunkData(int x, int y, int z, int sx, int sy, int sz, byte[] data) throws IOException, DataFormatException {
+	// helper functions for readChunkData
+	public void inflate(Inflater inf, byte[] dest) throws DataFormatException {
+		int complete = 0;
+		do {
+			complete = inf.inflate(dest, complete, dest.length-complete);
+		} while (complete < dest.length);
+	}
+	
+	private static int GetNibble(byte[] data, int i) {
+		if ((i&1) == 0) {
+			return data[i>>1] & 15;
+		}
+		return data[i>>1] >> 4;
+	}
+	// end helper functions
+	
+	public void readChunkData(int x, int y, int z, int sx, int sy, int sz, byte[] chunkdata) throws IOException, DataFormatException {
+		
 		boolean isEntireChunk = (sx == 16 && sy == 128 && sz == 16);
+		int size = sx*sy*sz;
 		int cx = x >> 4;
 		int cz = z >> 4;
 		
 		Chunk chunk = getChunk(cx, cz);
 		
 		Inflater inf = new Inflater();
-		inf.setInput(data);
+		inf.setInput(chunkdata);
 		
 		byte[] blocks;
+		byte[] metadata = new byte[size/2];
+		byte[] lightdata = new byte[size/2];
+		byte[] skylightdata = new byte[size/2];
 		
-		if (isEntireChunk && chunk != null) {
+		if (isEntireChunk) {
+			if (chunk == null) {
+				chunk = createEmptyChunk(cx, cz);
+			}
 			blocks = chunk.blocks;
 		} else {
-			blocks = new byte[sx*sy*sz];
+			blocks = new byte[size];
 		}
 		
-		int complete = 0;
-		do {
-			complete = inf.inflate(blocks, complete, blocks.length-complete);
-		} while (complete < blocks.length);
-		
-		if (chunk == null) {
-			if (isEntireChunk) {
-				createChunk(cx, cz, blocks);
-				return;
-			}
-			createEmptyChunk(cx, cz);
-		}
+		inflate(inf, blocks);
+		inflate(inf, metadata);
+		inflate(inf, lightdata);
+		inflate(inf, skylightdata);
 		
 		for (int bx = 0; bx < sx; bx++) {
 			for (int by = 0; by < sy; by++) {
 				for(int bz = 0; bz < sz; bz++) {
-					chunk.setBlock(x+bx, y+by, z+bz, blocks[bx*(sy*sz) + bz*(sy) + by]);
+					int i = bx*sy*sz + bz*sy + by;
+					if (!isEntireChunk) {
+						chunk.setBlock(x+bx, y+by, z+bz, blocks[i]);
+					}
+					chunk.setBlockData(x+bx, y+by, z+bz, GetNibble(metadata, i));
+					chunk.setBlockLight(x+bx, y+by, z+bz, GetNibble(lightdata, i));
+					chunk.setBlockSkyLight(x+bx, y+by, z+bz, GetNibble(skylightdata, i));
 				}
 			}
 		}
 	}
+	
 	public void multiBlockChange(int cx, int cz, int len, byte[] coords, byte[] types, byte[] metadata) {
 		Chunk chunk = getChunk(cx, cz);
 		for (int i = 0; i < len; i++) {
@@ -118,12 +180,10 @@ public final class World {
 		return chunks.containsKey(GetKey(cx, cz));
 	}
 	
-	public void createEmptyChunk(int cx, int cz) {
-		chunks.put(GetKey(cx, cz), new Chunk(cx, cz, new byte[16*16*128]));
-	}
-	
-	public void createChunk(int cx, int cz, byte[]data) {
-		chunks.put(GetKey(cx, cz), new Chunk(cx, cz, data));
+	public Chunk createEmptyChunk(int cx, int cz) {
+		Chunk c = new Chunk(cx, cz);
+		chunks.put(GetKey(cx, cz), c);
+		return c;
 	}
 	
 	public void deleteChunk(int cx, int cz) {

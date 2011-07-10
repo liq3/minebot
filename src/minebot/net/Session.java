@@ -94,7 +94,7 @@ public class Session {
 	}
 	
 	public void readMetadata() throws IOException {
-		byte x;
+		byte x = 0;
 		while ((x = reader.readByte()) != 127) {
 			switch (x >> 5) {
 			case 0:
@@ -273,7 +273,7 @@ public class Session {
 				int z = reader.readInt();
 				int yaw = reader.readByte();
 				int pitch = reader.readByte();
-				readMetadata(); // TODO
+				readMetadata();
 				byte[] meta = {};
 				MobEntity ent = new MobEntity(EID, x,y,z, yaw,pitch, type, meta);
 				world.entities.add(ent);
