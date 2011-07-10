@@ -1,11 +1,13 @@
-package minebot;
+package minebot.bot;
 
 import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import minebot.Config;
+import minebot.Player;
+import minebot.entities.*;
 import minebot.net.*;
-import minebot.world.*;
 
 
 public class Bot extends Player{

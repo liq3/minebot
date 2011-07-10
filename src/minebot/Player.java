@@ -2,8 +2,8 @@ package minebot;
 
 import java.io.IOException;
 
+import minebot.entities.*;
 import minebot.net.*;
-import minebot.world.*;
 
 public abstract class Player {
 	
@@ -22,6 +22,10 @@ public abstract class Player {
 	protected Session session;
 	protected PacketWriter writer;
 	protected World world;
+	
+	public int bx() { return (int)Math.floor(x); }
+	public int by() { return (int)Math.floor(y); }
+	public int bz() { return (int)Math.floor(z); }
 	
 	public Player(Session session) {
 		stance = 100;
@@ -42,10 +46,6 @@ public abstract class Player {
 	
 	public abstract void logic() throws IOException;
 	public abstract void handleChat(String chat);
-	
-	public int bx() { return (int)Math.floor(x); }
-	public int by() { return (int)Math.floor(y); }
-	public int bz() { return (int)Math.floor(z); }
 	
 	public void respawn() {
 		x = spawnX + 0.5;

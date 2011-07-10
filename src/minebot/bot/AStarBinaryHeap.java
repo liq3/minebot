@@ -1,4 +1,4 @@
-package minebot;
+package minebot.bot;
 
 public class AStarBinaryHeap extends AStarList {
 	

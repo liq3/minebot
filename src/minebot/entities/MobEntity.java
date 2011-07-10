@@ -1,4 +1,4 @@
-package minebot.world;
+package minebot.entities;
 
 
 public class MobEntity extends Entity {

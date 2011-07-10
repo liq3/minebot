@@ -2,6 +2,8 @@ package minebot;
 
 import java.io.*;
 
+
+import minebot.bot.Bot;
 import minebot.net.Session;
 
 public class Minebot

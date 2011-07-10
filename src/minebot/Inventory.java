@@ -1,6 +1,6 @@
 package minebot;
 
-import minebot.world.Item;
+import minebot.entities.Item;
 
 public class Inventory {
 	private Item[] items;

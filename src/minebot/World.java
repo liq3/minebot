@@ -1,10 +1,13 @@
-package minebot.world;
+package minebot;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+
+import minebot.entities.EntityManager;
+import minebot.entities.ItemID;
 
 public final class World {
 	

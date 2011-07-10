@@ -2,7 +2,9 @@ package minebot.net;
 
 import java.io.*;
 
-import minebot.Bot;
+import minebot.bot.Bot;
+
+
 
 public final class PacketWriter extends DataOutputStream {
 	public static final int PROTOCOL_VERSION = 14;
@@ -122,7 +124,7 @@ public final class PacketWriter extends DataOutputStream {
 		writeInt(z);
 		writeByte(dir);
 		writeShort(ID);
-		if (ID > -1) {
+		if (ID >= 0) {
 			writeByte(amount);
 			writeShort(uses);
 		}

@@ -1,4 +1,4 @@
-package minebot;
+package minebot.bot;
 
 import java.util.ArrayList;
 

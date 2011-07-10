@@ -1,10 +1,18 @@
-package minebot.world;
+package minebot.entities;
 
 public class Entity {
 	public int EID;
 	public int px, py, pz;
 	public double vx, vy, vz; // blocks per second
 	public double yaw, pitch;
+	
+	public double x() { return (double)px/32; }
+	public double y() { return (double)py/32; }
+	public double z() { return (double)pz/32; }
+	
+	public int bx() { return px >> 5; }
+	public int by() { return py >> 5; }
+	public int bz() { return pz >> 5; }
 	
 	public Entity() {
 	}
@@ -38,14 +46,6 @@ public class Entity {
 		this.vy = (double)vy/32000*5;
 		this.vz = (double)vz/32000*5;
 	}
-	
-	public double x() { return (double)px/32; }
-	public double y() { return (double)py/32; }
-	public double z() { return (double)pz/32; }
-	
-	public int bx() { return px >> 5; }
-	public int by() { return py >> 5; }
-	public int bz() { return pz >> 5; }
 	
 	@Override
 	public String toString() {

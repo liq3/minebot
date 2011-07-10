@@ -1,7 +1,7 @@
-package minebot;
+package minebot.bot;
 
-import minebot.world.ItemID;
-import minebot.world.World;
+import minebot.World;
+import minebot.entities.ItemID;
 
 public class AStar {
 	

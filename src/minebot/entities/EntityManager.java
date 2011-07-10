@@ -1,4 +1,4 @@
-package minebot.world;
+package minebot.entities;
 
 import java.util.HashMap;
 
