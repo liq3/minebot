@@ -19,10 +19,9 @@ public final class ObjectEntity extends Entity {
 	
 	public ObjectEntity(int EID, int x, int y, int z, int yaw, int pitch, int type) {
 		this.EID = EID;
-		move(x, y, z);
+		teleport(x, y, z);
 		look(yaw, pitch);
 		this.type = type;
-		System.out.println(this.toString());
 	}
 	
 	public String toString() {

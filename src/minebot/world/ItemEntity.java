@@ -7,11 +7,10 @@ public class ItemEntity extends Entity {
 	
 	public ItemEntity(int EID, int x, int y, int z, int yaw, int pitch, int roll, Item item) {
 		this.EID = EID;
-		move(x, y, z);
+		teleport(x, y, z);
 		look(yaw, pitch);
 		this.item = item;
 		this.roll = roll;
-		System.out.println(this.toString());
 	}
 	
 	@Override

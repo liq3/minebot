@@ -23,11 +23,10 @@ public class MobEntity extends Entity {
 	/* TODO: proper metadata */
 	public MobEntity(int EID, int x, int y, int z, int yaw, int pitch, int type, byte[] metadata) {
 		this.EID = EID;
-		move(x, y, z);
+		teleport(x, y, z);
 		look(yaw, pitch);
 		this.type = type;
 		this.metadata = metadata;
-		System.out.println(this.toString());
 	}
 	
 	public String toString() {

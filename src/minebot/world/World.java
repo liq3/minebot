@@ -12,25 +12,21 @@ public final class World {
 		public int cx, cz;
 		public byte[] blocks;
 		
-		public Chunk(int cx, int cz) {
+		public Chunk(int cx, int cz, byte[] blocks) {
 			this.cx = cx;
 			this.cz = cz;
-			
-			blocks = new byte[16*16*128];
-		}
-		
-		public Chunk(int cx, int cz, byte[] data) {
-			this.cx = cx;
-			this.cz = cz;
-			this.blocks = data;
+			this.blocks = blocks;
+			if (blocks.length != 16*16*128) {
+				System.out.println("Some sort of bug with creation of chunks");
+			}
 		}
 		
 		public void setBlock(int x, int y, int z, int type) {
-			blocks[(x & 15)*256 + (z & 15)*128 + y] = (byte)type;
+			blocks[(x&15)*128*16 + (z&15)*128 + (y&127)] = (byte)type;
 		}
 		
 		public int getBlock(int x, int y, int z) {
-			return blocks[(x & 15)*256 + (z & 15)*128 + y]; 
+			return blocks[(x&15)*128*16 + (z&15)*128 + (y&127)]; 
 		}
 	}
 	
@@ -72,9 +68,6 @@ public final class World {
 			}
 			createEmptyChunk(cx, cz);
 		}
-		x &= 15;
-		y &= 127;
-		z &= 15;
 		for (int bx = 0; bx < sx; bx++) {
 			for (int by = 0; by < sy; by++) {
 				for(int bz = 0; bz < sz; bz++) {
@@ -118,7 +111,7 @@ public final class World {
 	}
 	
 	public void createEmptyChunk(int cx, int cz) {
-		chunks.put(GetKey(cx, cz), new Chunk(cx, cz));
+		chunks.put(GetKey(cx, cz), new Chunk(cx, cz, new byte[16*16*128]));
 	}
 	
 	public void createChunk(int cx, int cz, byte[]data) {
@@ -133,7 +126,7 @@ public final class World {
 		return canStand((int)Math.floor(x), (int)y, (int)Math.floor(z));
 	}
 	
-	public boolean canStand(int x, int y, int z) {		
+	public boolean canStand(int x, int y, int z) {
 		int b1 = getBlock(x,y-1,z);
 		int b2 = getBlock(x,y,z);
 		int b3 = getBlock(x,y+1,z);

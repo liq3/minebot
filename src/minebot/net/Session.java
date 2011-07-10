@@ -86,10 +86,10 @@ public class Session {
 	
 	public byte[] readBytes(int length) throws IOException {
 		byte[] bytes = new byte[length];
-		int recv = 0;
-		do {
-			reader.read(bytes, recv, length-recv);
-		} while (recv < length);
+		int recv = reader.read(bytes, 0, length);
+		while (recv < length) {
+			recv = reader.read(bytes, recv, length-recv);
+		}
 		return bytes;
 	}
 	
@@ -378,7 +378,7 @@ public class Session {
 				int sz = reader.readByte();
 				int size = reader.readInt();
 				byte[] data = readBytes(size);
-				world.readChunkData(x, y, z, sx, sy, sz, data);
+				world.readChunkData(x, y, z, sx+1, sy+1, sz+1, data);
 				break;
 			}
 			case PacketID.MultiBlockChange: {

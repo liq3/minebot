@@ -11,7 +11,7 @@ public class Entity {
 	}
 	public Entity(int EID, int x, int y, int z, int yaw, int pitch) {
 		this.EID = EID;
-		move(x, y, z);
+		teleport(x, y, z);
 		look(yaw, pitch);
 		System.out.println(this.toString());
 	}
