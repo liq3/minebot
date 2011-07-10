@@ -13,6 +13,7 @@ public class Session {
 	public boolean connected;
 	
 	public World world;
+	
 	public int EID;
 	
 	public String username;
@@ -78,11 +79,18 @@ public class Session {
 	public String readString8() throws IOException {
 		return reader.readUTF();
 	}
-	public String readString16() throws Exception {
-		int len = reader.readShort()*2;
-		byte[] buff = new byte[len];
-		reader.read(buff, 0, len);
-		return new String(buff, 0, len, "UTF-16BE");
+	
+	public String readString16() throws IOException {
+		return new String(readBytes(reader.readShort()*2), "UTF-16BE");
+	}
+	
+	public byte[] readBytes(int length) throws IOException {
+		byte[] bytes = new byte[length];
+		int recv = 0;
+		do {
+			reader.read(bytes, recv, length-recv);
+		} while (recv < length);
+		return bytes;
 	}
 	
 	public void readMetadata() throws IOException {
@@ -369,24 +377,17 @@ public class Session {
 				int sy = reader.readByte();
 				int sz = reader.readByte();
 				int size = reader.readInt();
-				byte[] data = new byte[size];
-				int recv = reader.read(data, 0, size);
-				while (recv < size) {
-					recv += reader.read(data, recv, size-recv);
-				}
-				world.readChunkData(x,y,z,sx,sy,sz,data);
+				byte[] data = readBytes(size);
+				world.readChunkData(x, y, z, sx, sy, sz, data);
 				break;
 			}
 			case PacketID.MultiBlockChange: {
 				int cx = reader.readInt();
 				int cz = reader.readInt();
 				int len = reader.readShort();
-				byte[] coords = new byte[len*2];					
-				byte[] types = new byte[len];
-				byte[] metadata = new byte[len];
-				reader.read(coords, 0, len*2);
-				reader.read(types, 0, len);					
-				reader.read(metadata, 0, len);
+				byte[] coords = readBytes(len*2);
+				byte[] types = readBytes(len);
+				byte[] metadata = readBytes(len);
 				world.multiBlockChange(cx, cz, len, coords, types, metadata);
 				break;
 			}
@@ -396,7 +397,7 @@ public class Session {
 				int z = reader.readInt();
 				int type = reader.readByte();
 				int metadata = reader.readByte();
-				world.setBlockType(x,y,z,type);
+				world.setBlock(x, y, z, type);
 				break;
 			}
 			case PacketID.BlockAction: // TODO

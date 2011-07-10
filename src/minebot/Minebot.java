@@ -9,7 +9,7 @@ public class Minebot
 	private static Bot bot;
 	private static Session session;
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) throws IOException, InterruptedException {
 		
 		try {
 			Config.Load("config.txt");

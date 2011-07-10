@@ -1,7 +1,6 @@
 package minebot.net;
 
 public final class PacketID {
-	
 	public static final int KeepAlive			= 0x00;
 	public static final int LoginRequest		= 0x01;
 	public static final int Handshake			= 0x02;
@@ -60,5 +59,4 @@ public final class PacketID {
 	public static final int MapData				= 0x83;
 	public static final int IncrementStatistic	= 0xC8;
 	public static final int Kick				= 0xFF;
-	
 }

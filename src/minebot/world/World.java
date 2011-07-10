@@ -1,141 +1,142 @@
 package minebot.world;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
-import java.util.*;
-
-
 
 public final class World {
-	private Map<Integer, byte[]> chunks;
 	
+	public final class Chunk {
+		public int cx, cz;
+		public byte[] blocks;
+		
+		public Chunk(int cx, int cz) {
+			this.cx = cx;
+			this.cz = cz;
+			
+			blocks = new byte[16*16*128];
+		}
+		
+		public Chunk(int cx, int cz, byte[] data) {
+			this.cx = cx;
+			this.cz = cz;
+			this.blocks = data;
+		}
+		
+		public void setBlock(int x, int y, int z, int type) {
+			blocks[(x & 15)*256 + (z & 15)*128 + y] = (byte)type;
+		}
+		
+		public int getBlock(int x, int y, int z) {
+			return blocks[(x & 15)*256 + (z & 15)*128 + y]; 
+		}
+	}
+	
+	public static int GetKey(int cx, int cz) {
+		return cx + (cz << 16);
+	}
+	
+	public Map<Integer, Chunk> chunks;
 	public EntityManager entities;
 	
 	public World() {
-		chunks = new HashMap<Integer, byte[]>();
+		chunks = new HashMap<Integer, Chunk>();
 		entities = new EntityManager();
 	}
 	
-	public void readChunkData(int x, int y, int z, int sx, int sy, int sz, byte[] data) throws IOException {
-		sx = sx+1;
-		sy = sy+1;
-		sz = sz+1;
-		int size = sx * sy * sz;
+	public void readChunkData(int x, int y, int z, int sx, int sy, int sz, byte[] data) throws IOException, DataFormatException {
+		boolean isEntireChunk = (sx == 16 && sy == 128 && sz == 16);
+		int cx = x >> 4;
+		int cz = z >> 4;
 		
-		Inflater inflater = new Inflater();
-		inflater.setInput(data);
+		Chunk chunk = getChunk(cx, cz);
 		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+		Inflater inf = new Inflater();
+		inf.setInput(data);
 		
-		byte[] buff = new byte[1024];
-		while (!inflater.finished()) {
-			try {
-				int count = inflater.inflate(buff);
-				bos.write(buff, 0, count);
-			} catch (DataFormatException e) {
+		byte[] blocks;
+		
+		if (isEntireChunk && chunk != null) {
+			blocks = chunk.blocks;
+		} else {
+			blocks = new byte[sx*sy*sz];
+		}
+		inf.inflate(blocks, 0, blocks.length);
+		
+		if (chunk == null) {
+			if (isEntireChunk) {
+				createChunk(cx, cz, blocks);
+				return;
 			}
+			createEmptyChunk(cx, cz);
 		}
-		bos.close();
-		
-		byte[] decompressedData = bos.toByteArray();
-		
-		byte[] blockData = new byte[size];
-		for (int i = 0; i < blockData.length; i++) {
-			blockData[i] = decompressedData[i];
-		}
-		
-		int cx = (int)(x) >> 4;
-		int cz = (int)(z) >> 4;
-		int key = getKey(cx, cz);
-		if (!chunks.containsKey(key) && size == 16*16*128) {
-			chunks.put(key, blockData);
-		} else if (chunks.containsKey(key)) {
-			x = x & 15;
-			y = y & 127;
-			z = z & 15;			
-			for (int ix = 0; ix < sx; ix++) {
-				for (int iy = 0; iy < sy; iy++) {
-					for (int iz = 0; iz < sz; iz++) {
-						chunks.get(key)[(y+iy) + (((z+iz) * sy) + ((x+ix) * sy * sx))] = blockData[iy + (iz * sy) + (ix * sy * sz)];
-					}
+		x &= 15;
+		y &= 127;
+		z &= 15;
+		for (int bx = 0; bx < sx; bx++) {
+			for (int by = 0; by < sy; by++) {
+				for(int bz = 0; bz < sz; bz++) {
+					chunk.setBlock(x+bx, y+by, z+bz, blocks[bx*(sy*sz) + bz*(sy) + by]);
 				}
 			}
 		}
 	}
-	
-	public int block(double x, double y, double z) {
-		x = Math.floor(x);
-		z = Math.floor(z);
-		return block((int)x, (int)y, (int)z);
-	}
-		
-	public int block(int x, int y, int z) {
-		if (chunks.containsKey(getKey(x >> 4, z >> 4))) {
-			return chunks.get(getKey(x >> 4, z >> 4))[getIndex(x,y,z)];
-		} else {
-			//System.out.println("Chunk doesn't exist."+x+" "+y+" "+z+" "+cx+" "+cz);
-			return 0;
-		}
-	}
-	
-	public void setBlockType(int x, int y, int z, int type) {
-		int key = getKey(x >> 4, z >> 4);
-		if (chunks.containsKey(key)) {
-			chunks.get(key)[getIndex(x,y,z)] = (byte)(type);
-		}
-	}
-	
-	private int getIndex(int x, int y, int z) {
-		return (y&127) + (((z&15) * 128) + ((x&15) * 128 * 16));
-	}
-	
 	public void multiBlockChange(int cx, int cz, int len, byte[] coords, byte[] types, byte[] metadata) {
-		int key = getKey(cx,cz);
-		int[] x = new int[len];
-		int[] y = new int[len];
-		int[] z = new int[len];
+		Chunk chunk = getChunk(cx, cz);
 		for (int i = 0; i < len; i++) {
-			x[i] = coords[i*2] >> 4;
-			z[i] = coords[i*2] & 15;
-			y[i] = coords[i*2+1];
+			chunk.setBlock((coords[i*2]>>4), (coords[i*2+1]), (coords[i*2]&15), types[i]);
 		}
-		for (int i = 0; i < len; i++) {
-			chunks.get(key)[getIndex(x[i],y[i],z[i])] = types[i];
+	}
+	
+	public void setBlock(int x, int y, int z, int type) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) {
+			c.setBlock(x, y, z, type);
 		}
+	}
+	
+	public int getBlock(int x, int y, int z) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) {
+			return c.getBlock(x, y, z);
+		}
+		return 0;
+	}
+	
+	public int getBlock(double x, double y, double z) {
+		return getBlock((int)Math.floor(x), (int)y, (int)Math.floor(z));
+	}
+	
+	public Chunk getChunk(int cx, int cz) {
+		return chunks.get(GetKey(cx, cz));
+	}
+	
+	public boolean containsChunk(int cx, int cz) {
+		return chunks.containsKey(GetKey(cx, cz));
 	}
 	
 	public void createEmptyChunk(int cx, int cz) {
-		int key = getKey(cx, cz);
-		if (!chunks.containsKey(key)) {
-			byte[] block = new byte[128*16*16];
-			for (int i = 0; i < 128*16*16; i++) {
-				block[i] = 0;
-			}
-			chunks.put(key, block);
-		}
+		chunks.put(GetKey(cx, cz), new Chunk(cx, cz));
+	}
+	
+	public void createChunk(int cx, int cz, byte[]data) {
+		chunks.put(GetKey(cx, cz), new Chunk(cx, cz, data));
 	}
 	
 	public void deleteChunk(int cx, int cz) {
-		chunks.remove(getKey(cx,cz));
-	}
-	
-	private int getKey(int cx, int cz) {
-		return cx + (cz << 16);
+		chunks.remove(GetKey(cx, cz));
 	}
 	
 	public boolean canStand(double x, double y, double z) {
-		x = Math.floor(x);
-		z = Math.floor(z);
-		
-		return canStand((int)x, (int)y, (int)z);
+		return canStand((int)Math.floor(x), (int)y, (int)Math.floor(z));
 	}
 	
 	public boolean canStand(int x, int y, int z) {		
-		int b1 = block(x,y-1,z);
-		int b2 = block(x,y,z);
-		int b3 = block(x,y+1,z);
+		int b1 = getBlock(x,y-1,z);
+		int b2 = getBlock(x,y,z);
+		int b3 = getBlock(x,y+1,z);
 
 		if (ItemID.solid[b1] && !ItemID.solid[b2] && !ItemID.solid[b3]) {
 			return true;
@@ -143,3 +144,11 @@ public final class World {
 		return false;
 	}
 }
+
+
+
+
+
+
+
+

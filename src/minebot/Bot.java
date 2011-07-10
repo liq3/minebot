@@ -31,13 +31,13 @@ public class Bot extends Player{
 		int speed = 50;
 		while (moveTime > speed && spawned) {
 			
-			if (digging && world.block(digX, digY, digZ) == 0) { 
+			if (digging && world.getBlock(digX, digY, digZ) == 0) { 
 				digging = false;
 			}
 			
 			writer.writePositionAndLook(this);
 							
-			if (!ItemID.solid[ world.block(x,y-1,z) ] && moveList.isEmpty()) {
+			if (!ItemID.solid[ world.getBlock(x,y-1,z) ] && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						

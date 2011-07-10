@@ -60,7 +60,7 @@ public class AStar {
 						open.add(newBlock);
 					}					
 				} 
-				if (map.canStand(bx,block.y-1,bz) && !ItemID.solid[ map.block(bx,block.y+1,bz) ] ) {
+				if (map.canStand(bx,block.y-1,bz) && !ItemID.solid[ map.getBlock(bx,block.y+1,bz) ] ) {
 					PathBlock newBlock2 = new PathBlock(bx,block.y,bz,dx,dy,dz,block);
 					PathBlock newBlock = new PathBlock(bx,block.y-1,bz,dx,dy,dz,newBlock2);
 					if (!closed.contains(newBlock) && !open.contains(newBlock) && !closed.contains(newBlock2)) {
@@ -68,7 +68,7 @@ public class AStar {
 						open.add(newBlock);
 					}
 				}
-				if (map.canStand(bx,block.y+1,bz) && !ItemID.solid[ map.block(block.x,block.y+2,block.z) ] ) {
+				if (map.canStand(bx,block.y+1,bz) && !ItemID.solid[ map.getBlock(block.x,block.y+2,block.z) ] ) {
 					PathBlock newBlock2 = new PathBlock(block.x,block.y+1,block.z,dx,dy,dz,block);
 					PathBlock newBlock = new PathBlock(bx,block.y+1,bz,dx,dy,dz,newBlock2);
 					if (!closed.contains(newBlock) && !open.contains(newBlock) && !closed.contains(newBlock2)) {
