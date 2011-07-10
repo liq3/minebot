@@ -94,7 +94,7 @@ public class Session {
 	}
 	
 	public void readMetadata() throws IOException {
-		byte x = reader.readByte();
+		byte x;
 		while ((x = reader.readByte()) != 127) {
 			switch (x >> 5) {
 			case 0:

@@ -47,10 +47,6 @@ public abstract class Player {
 	public int by() { return (int)Math.floor(y); }
 	public int bz() { return (int)Math.floor(z); }
 	
-	public int cx() { return ((int)Math.floor(x)) >> 4; }
-	public int cy() { return ((int)Math.floor(y)) >> 4; }
-	public int cz() { return ((int)Math.floor(z)) >> 4; }
-	
 	public void respawn() {
 		x = spawnX + 0.5;
 		y = spawnY;
