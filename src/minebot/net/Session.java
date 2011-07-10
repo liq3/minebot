@@ -95,21 +95,34 @@ public class Session {
 	
 	public void readMetadata() throws IOException {
 		byte x = reader.readByte();
-		while (x != 127) {
+		while ((x = reader.readByte()) != 127) {
 			switch (x >> 5) {
-			case 0: 
+			case 0:
 				reader.readByte();
 				break;
 			case 1:
+				reader.readShort();
+				break;
 			case 2:
+				reader.readInt();
+				break;
 			case 3:
+				reader.readFloat();
+				break;
 			case 4:
+				readString16();
+				break;
 			case 5:
+				reader.readShort();
+				reader.readByte();
+				reader.readShort();
+				break;
 			case 6:
-				System.out.println("Op 0x18 non case 0.");
-				// System.exit(0);
+				reader.readInt();
+				reader.readInt();
+				reader.readInt();
+				break;
 			}
-			x = reader.readByte();
 		}
 	}
 	
@@ -177,7 +190,7 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.Respawn: // TODO?
+			case PacketID.Respawn:
 				reader.readByte();
 				player.respawn();
 				break;
@@ -261,7 +274,7 @@ public class Session {
 				int yaw = reader.readByte();
 				int pitch = reader.readByte();
 				readMetadata(); // TODO
-				byte[] meta = new byte[0];
+				byte[] meta = {};
 				MobEntity ent = new MobEntity(EID, x,y,z, yaw,pitch, type, meta);
 				world.entities.add(ent);
 				break;
