@@ -25,6 +25,6 @@ public final class ObjectEntity extends Entity {
 	}
 	
 	public String toString() {
-		return String.format("Entity: EID=%d, x=%f, y=%f, z=%f, yaw=%f, pitch=%f, type=%d", EID, x, y, z, yaw, pitch, type);
+		return String.format("Entity: EID=%d, x=%f, y=%f, z=%f, yaw=%f, pitch=%f, type=%d", EID, x(), y(), z(), yaw, pitch, type);
 	}
 }

@@ -15,6 +15,6 @@ public class ItemEntity extends Entity {
 	
 	@Override
 	public String toString() {
-		return String.format("Item Entity: EID=%d, x=%f, y=%f, z=%f, yaw=%f, pitch=%f, roll=%f %s", EID, x, y, z, yaw, pitch, roll, item.toString());
+		return String.format("Item Entity: EID=%d, x=%f, y=%f, z=%f, yaw=%f, pitch=%f, roll=%f %s", EID, x(), y(), z(), yaw, pitch, roll, item.toString());
 	}
 }

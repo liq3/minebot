@@ -179,7 +179,7 @@ public class Session {
 			}
 			case PacketID.Respawn: // TODO?
 				reader.readByte();
-				player.stance = player.y = player.spawnY*32;
+				player.respawn();
 				break;
 				
 			case PacketID.PositionAndLook:
@@ -283,7 +283,7 @@ public class Session {
 				int vz = reader.readShort();
 				Entity ent = world.entities.get(EID);
 				if (ent != null) {
-					ent.setVelocity(vx, vy, vz);
+					ent.velocity(vx, vy, vz);
 				}
 				break;
 			}

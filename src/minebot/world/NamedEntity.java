@@ -15,6 +15,6 @@ public class NamedEntity extends Entity {
 	}
 	
 	public String toString() {
-		return String.format("Named Entity: EID=%d, x=%f, y=%f, z=%f, yaw=%f, pitch=%f, name=%s, currentItem=%d", EID, x, y, z, yaw, pitch, name, currentItem);
+		return String.format("Named Entity: name=%s, EID=%d, x=%f, y=%f, z=%f, yaw=%f, pitch=%f, currentItem=%d", name, EID, x(), y(), z(), yaw, pitch, currentItem);
 	}
 }

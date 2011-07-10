@@ -11,10 +11,6 @@ public class AStar {
 		this.map = map;
 	}
 	
-	public PathBlock[] getPath(double sx, double sy, double sz, double dx, double dy, double dz) {
-		return getPath((int)sx, (int)sy, (int)sz, (int)dx, (int)dy, (int)dz);
-	}	
-	
 	public PathBlock[] getPath(int sx, int sy, int sz, int dx, int dy, int dz) {
 		if (!map.canStand(dx, dy, dz)) {
 			System.out.println("Path: Invalid destination.");

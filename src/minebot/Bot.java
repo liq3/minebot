@@ -70,10 +70,9 @@ public class Bot extends Player{
 		if (name.equals(Config.master) && cmd.equals("move")) {
 			NamedEntity ent = world.entities.getByName(Config.master);
 			if (ent != null) {
-				System.out.println("Starting path. Start:"+x+","+y+","+z+" End:"+ent.x+","+ent.y+","+ent.z);
-				System.out.println(world.getBlock(ent.x, ent.y-1, ent.z));
+				System.out.println("Starting path. Start:"+x+","+y+","+z+" End:"+ent.x()+","+ent.y()+","+ent.z());
 				AStar AStarPath = new AStar(world);
-				PathBlock[] path = AStarPath.getPath(Math.floor(x),Math.floor(y),Math.floor(z), Math.floor(ent.x), Math.floor(ent.y), Math.floor(ent.z));
+				PathBlock[] path = AStarPath.getPath(bx(), by(), bz(), ent.bx(), ent.by(), ent.bz());
 				if (path == null) {
 					System.out.println("No path.");
 					return;

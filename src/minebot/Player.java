@@ -5,14 +5,15 @@ import java.io.IOException;
 import minebot.net.*;
 import minebot.world.*;
 
-public abstract class Player extends NamedEntity {
+public abstract class Player {
 	
 	public Inventory inventory;
 	
-	public int spawnX;
-	public int spawnY;
-	public int spawnZ;
+	public int EID;
+	public double x, y, z;
+	public double yaw, pitch;
 	public double stance;
+	public int spawnX, spawnY, spawnZ;
 	public boolean onGround;
 	public boolean digging;
 	public boolean spawned;
@@ -23,7 +24,6 @@ public abstract class Player extends NamedEntity {
 	protected World world;
 	
 	public Player(Session session) {
-		super(session.EID, 0, 100, 0, 0, 0, session.username, -1);
 		stance = 100;
 		onGround = true;
 		spawned = false;
@@ -37,31 +37,29 @@ public abstract class Player extends NamedEntity {
 		this.world = session.world;
 		this.writer = session.writer;
 		
-		world.entities.add(this);
 		session.player = this;
 	}
 	
 	public abstract void logic() throws IOException;
 	public abstract void handleChat(String chat);
 	
-	@Override
-	public void teleport(int x, int y, int z) {
-		this.x = (double)x/32;
-		this.y = (double)y/32;
-		this.z = (double)z/32;
-		stance = (double)y/32;
-	}
+	public int bx() { return (int)Math.floor(x); }
+	public int by() { return (int)Math.floor(y); }
+	public int bz() { return (int)Math.floor(z); }
 	
-	@Override
-	public void move(int dx, int dy, int dz) {
-		this.x += (double)dx/32;
-		this.y += (double)dy/32;
-		this.z += (double)dz/32;
-		stance += (double)dy/32;
+	public int cx() { return ((int)Math.floor(x)) >> 4; }
+	public int cy() { return ((int)Math.floor(y)) >> 4; }
+	public int cz() { return ((int)Math.floor(z)) >> 4; }
+	
+	public void respawn() {
+		x = spawnX + 0.5;
+		y = spawnY;
+		z = spawnZ + 0.5;
+		stance = y + 1.62;
 	}
 	
 	private void dig(double x, double y, double z) throws IOException {
-		dig((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z));
+		dig(bx(), by(), bz());
 	}
 	
 	private void dig(int x, int y, int z) throws IOException {
