@@ -59,7 +59,11 @@ public final class World {
 		} else {
 			blocks = new byte[sx*sy*sz];
 		}
-		inf.inflate(blocks, 0, blocks.length);
+		
+		int complete = 0;
+		do {
+			complete = inf.inflate(blocks, complete, blocks.length-complete);
+		} while (complete < blocks.length);
 		
 		if (chunk == null) {
 			if (isEntireChunk) {
@@ -68,6 +72,7 @@ public final class World {
 			}
 			createEmptyChunk(cx, cz);
 		}
+		
 		for (int bx = 0; bx < sx; bx++) {
 			for (int by = 0; by < sy; by++) {
 				for(int bz = 0; bz < sz; bz++) {

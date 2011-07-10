@@ -86,10 +86,10 @@ public class Session {
 	
 	public byte[] readBytes(int length) throws IOException {
 		byte[] bytes = new byte[length];
-		int recv = reader.read(bytes, 0, length);
-		while (recv < length) {
+		int recv = 0;
+		do {
 			recv = reader.read(bytes, recv, length-recv);
-		}
+		} while (recv < length);
 		return bytes;
 	}
 	
