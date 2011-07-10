@@ -54,11 +54,11 @@ public final class World {
 		}
 		
 		public int getSkyLight(int x, int y, int z) {
-			return lightdata[GetIndex(x, y, z)];
+			return skylightdata[GetIndex(x, y, z)];
 		}
 		
 		public void setSkyLight(int x, int y, int z, int value) {
-			lightdata[GetIndex(x, y, z)] = (byte)(value&15);
+			skylightdata[GetIndex(x, y, z)] = (byte)(value&15);
 		}
 	}
 	
