@@ -15,7 +15,7 @@ public final class World {
 		public int cx, cz;
 		
 		public byte[] blocks;
-		// extra data is expanded from nibbles to bytes for simplicity
+		// expanded from nibbles to bytes for simplicity
 		public byte[] metadata;
 		
 		public Chunk(int cx, int cz) {
@@ -69,9 +69,7 @@ public final class World {
 	}
 	
 	private static int GetNibble(byte[] data, int i) {
-		if ((i&1) == 0) {
-			return data[i>>1] & 15;
-		}
+		if ((i&1) == 0) return data[i>>1] & 15;
 		return data[i>>1] >> 4;
 	}
 	// end helper functions
@@ -128,29 +126,33 @@ public final class World {
 	}
 	
 	public int getBlock(int x, int y, int z) {
-		Chunk c = getChunk(x >> 4, z >> 4);
+		Chunk c = getChunk2(x, z);
 		if (c != null) return c.getBlock(x, y, z);
 		return 0;
 	}
 	
 	public void setBlock(int x, int y, int z, int type) {
-		Chunk c = getChunk(x >> 4, z >> 4);
+		Chunk c = getChunk2(x, z);
 		if (c != null) c.setBlock(x, y, z, type);
 	}
 	
 	public int getData(int x, int y, int z) {
-		Chunk c = getChunk(x >> 4, z >> 4);
+		Chunk c = getChunk2(x, z);
 		if (c != null) return c.getData(x, y, z);
 		return 0;
 	}
 	
 	public void setData(int x, int y, int z, int data) {
-		Chunk c = getChunk(x >> 4, z >> 4);
+		Chunk c = getChunk2(x, z);
 		if (c != null) c.setData(x, y, z, data);
 	}
 	
 	public Chunk getChunk(int cx, int cz) {
 		return chunks.get(GetKey(cx, cz));
+	}
+	
+	public Chunk getChunk2(int x, int z) {
+		return chunks.get(GetKey(x >> 4, z >> 4));
 	}
 	
 	public Chunk createEmptyChunk(int cx, int cz) {
