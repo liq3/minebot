@@ -37,27 +37,27 @@ public final class World {
 			blocks[GetIndex(x, y, z)] = (byte)type;
 		}
 		
-		public int getBlockData(int x, int y, int z) {
+		public int getData(int x, int y, int z) {
 			return metadata[GetIndex(x, y, z)];
 		}
 		
-		public void setBlockData(int x, int y, int z, int data) {
+		public void setData(int x, int y, int z, int data) {
 			metadata[GetIndex(x, y, z)] = (byte)(data&15);
 		}
 		
-		public int getBlockLight(int x, int y, int z) {
+		public int getLight(int x, int y, int z) {
 			return lightdata[GetIndex(x, y, z)];
 		}
 		
-		public void setBlockLight(int x, int y, int z, int value) {
+		public void setLight(int x, int y, int z, int value) {
 			lightdata[GetIndex(x, y, z)] = (byte)(value&15);
 		}
 		
-		public int getBlockSkyLight(int x, int y, int z) {
+		public int getSkyLight(int x, int y, int z) {
 			return lightdata[GetIndex(x, y, z)];
 		}
 		
-		public void setBlockSkyLight(int x, int y, int z, int value) {
+		public void setSkyLight(int x, int y, int z, int value) {
 			lightdata[GetIndex(x, y, z)] = (byte)(value&15);
 		}
 	}
@@ -138,9 +138,9 @@ public final class World {
 					if (!isEntireChunk) {
 						chunk.setBlock(x+bx, y+by, z+bz, blocks[i]);
 					}
-					chunk.setBlockData(x+bx, y+by, z+bz, GetNibble(metadata, i));
-					chunk.setBlockLight(x+bx, y+by, z+bz, GetNibble(lightdata, i));
-					chunk.setBlockSkyLight(x+bx, y+by, z+bz, GetNibble(skylightdata, i));
+					chunk.setData(x+bx, y+by, z+bz, GetNibble(metadata, i));
+					chunk.setLight(x+bx, y+by, z+bz, GetNibble(lightdata, i));
+					chunk.setSkyLight(x+bx, y+by, z+bz, GetNibble(skylightdata, i));
 				}
 			}
 		}
@@ -149,27 +149,56 @@ public final class World {
 	public void multiBlockChange(int cx, int cz, int len, byte[] coords, byte[] types, byte[] metadata) {
 		Chunk chunk = getChunk(cx, cz);
 		for (int i = 0; i < len; i++) {
-			chunk.setBlock((coords[i*2]>>4), (coords[i*2+1]), (coords[i*2]&15), types[i]);
-		}
-	}
-	
-	public void setBlock(int x, int y, int z, int type) {
-		Chunk c = getChunk(x >> 4, z >> 4);
-		if (c != null) {
-			c.setBlock(x, y, z, type);
+			int x = coords[i*2] >> 4;
+			int y = coords[i*2+1];
+			int z = coords[i*2]&15;
+			chunk.setBlock(x, y, z, types[i]);
+			chunk.setData(x, y, z, metadata[i]);
 		}
 	}
 	
 	public int getBlock(int x, int y, int z) {
 		Chunk c = getChunk(x >> 4, z >> 4);
-		if (c != null) {
-			return c.getBlock(x, y, z);
-		}
+		if (c != null) return c.getBlock(x, y, z);
 		return 0;
 	}
 	
-	public int getBlock(double x, double y, double z) {
-		return getBlock((int)Math.floor(x), (int)y, (int)Math.floor(z));
+	public void setBlock(int x, int y, int z, int type) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) c.setBlock(x, y, z, type);
+	}
+	
+	public int getData(int x, int y, int z) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) return c.getData(x, y, z);
+		return 0;
+	}
+	
+	public void setData(int x, int y, int z, int data) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) c.setData(x, y, z, data);
+	}
+	
+	public int getLight(int x, int y, int z) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) return c.getLight(x, y, z);
+		return 0;
+	}
+	
+	public void setLight(int x, int y, int z, int value) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) c.setLight(x, y, z, value);
+	}
+	
+	public int getSkyLight(int x, int y, int z) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) return c.getSkyLight(x, y, z);
+		return 0;
+	}
+	
+	public void setSkyLight(int x, int y, int z, int value) {
+		Chunk c = getChunk(x >> 4, z >> 4);
+		if (c != null) c.setSkyLight(x, y, z, value);
 	}
 	
 	public Chunk getChunk(int cx, int cz) {

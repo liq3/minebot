@@ -411,6 +411,7 @@ public class Session {
 				int type = reader.readByte();
 				int metadata = reader.readByte();
 				world.setBlock(x, y, z, type);
+				world.setData(x, type, z, metadata);
 				break;
 			}
 			case PacketID.BlockAction: // TODO

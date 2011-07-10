@@ -39,7 +39,7 @@ public class Bot extends Player{
 			
 			writer.writePositionAndLook(this);
 							
-			if (!ItemID.solid[ world.getBlock(x,y-1,z) ] && moveList.isEmpty()) {
+			if (!ItemID.solid[ world.getBlock(bx(),by()-1,bz()) ] && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						
