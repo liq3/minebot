@@ -72,10 +72,6 @@ public final class World {
 	
 	public static int CHUNK_SIZE = 16*16*128;
 	
-	private static int METADATA_OFFSET = CHUNK_SIZE;
-	private static int LIGHTDATA_OFFSET = METADATA_OFFSET + CHUNK_SIZE/2;
-	private static int SKYLIGHTDATA_OFFSET = LIGHTDATA_OFFSET + CHUNK_SIZE/2;
-	
 	public Map<Integer, Chunk> chunks;
 	public EntityManager entities;
 	
@@ -85,7 +81,7 @@ public final class World {
 	}
 	
 	// helper functions for readChunkData
-	public void inflate(Inflater inf, byte[] dest) throws DataFormatException {
+	private static void Inflate(Inflater inf, byte[] dest) throws DataFormatException {
 		int complete = 0;
 		do {
 			complete = inf.inflate(dest, complete, dest.length-complete);
@@ -126,10 +122,10 @@ public final class World {
 			blocks = new byte[size];
 		}
 		
-		inflate(inf, blocks);
-		inflate(inf, metadata);
-		inflate(inf, lightdata);
-		inflate(inf, skylightdata);
+		Inflate(inf, blocks);
+		Inflate(inf, metadata);
+		Inflate(inf, lightdata);
+		Inflate(inf, skylightdata);
 		
 		for (int bx = 0; bx < sx; bx++) {
 			for (int by = 0; by < sy; by++) {
@@ -205,10 +201,6 @@ public final class World {
 		return chunks.get(GetKey(cx, cz));
 	}
 	
-	public boolean containsChunk(int cx, int cz) {
-		return chunks.containsKey(GetKey(cx, cz));
-	}
-	
 	public Chunk createEmptyChunk(int cx, int cz) {
 		Chunk c = new Chunk(cx, cz);
 		chunks.put(GetKey(cx, cz), c);
@@ -234,11 +226,3 @@ public final class World {
 		return false;
 	}
 }
-
-
-
-
-
-
-
-
