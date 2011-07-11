@@ -70,6 +70,7 @@ public abstract class Player {
 		digZ = z;
 		writer.writeDigging(PacketWriter.DIGGING_BEGIN, x, y, z, 4);		
 		writer.writeDigging(PacketWriter.DIGGING_END, x,y,z, 4);
+		writer.flush();
 	}
 	
 	public void doneDigging() {
@@ -84,10 +85,9 @@ public abstract class Player {
 		}
 		
 		writer.writeHoldingChange(slot-36);
-	
 		Item item = inventory.getItem(slot);
-		
 		writer.writeBlockPlacement(x,y,z,0, item.ID, item.count, item.data);
+		writer.flush();
 	}
 	
 	@Override

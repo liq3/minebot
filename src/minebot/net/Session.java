@@ -35,9 +35,9 @@ public final class Session {
 		String loginURL = String.format("https://login.minecraft.net/?user=%s&password=%s&version=9999", username, password);
 		
 		URL url = new URL(loginURL);
-		URLConnection conn = url.openConnection();
+		URLConnection connection = url.openConnection();
 		
-		BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String line = rd.readLine();
 		rd.close();
 		System.out.println(line);
@@ -54,9 +54,11 @@ public final class Session {
 		writer = new PacketWriter(socket.getOutputStream());
 		
 		writer.writeHandshake(username);
+		writer.flush();
 		readPacket();
 		
 		writer.writeLoginRequest(username);
+		writer.flush();
 		readPacket();
 	}
 	
@@ -132,9 +134,11 @@ public final class Session {
 		int opcode = -1;
 		try {
 			opcode = reader.readUnsignedByte();
+			
 			switch (opcode) {
 			case Packets.Ping:
 				writer.writePing();
+				writer.flush();
 				break;
 				
 			case Packets.LoginRequest: {
@@ -187,6 +191,7 @@ public final class Session {
 				int hp = reader.readShort();
 				if (hp <= 0) {
 					writer.writeRespawn(PacketWriter.DIMENSION_WORLD);
+					writer.flush();
 				}
 				break;
 			}

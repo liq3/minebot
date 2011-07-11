@@ -37,6 +37,7 @@ public final class Bot extends Player{
 			}
 			
 			writer.writePositionAndLook(this);
+			writer.flush();
 							
 			if (!Blocks.isSolid( world.getBlock(bx(),by()-1,bz()) ) && moveList.isEmpty()) {
 				addMove(0,-1,0);
