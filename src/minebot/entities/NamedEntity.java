@@ -1,7 +1,7 @@
 package minebot.entities;
 
 
-public class NamedEntity extends Entity {
+public final class NamedEntity extends Entity {
 	public String name;
 	public int currentItem;
 	

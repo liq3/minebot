@@ -2,7 +2,6 @@ package minebot.entities;
 
 import java.util.HashMap;
 
-
 public final class EntityManager {
 	
 	public HashMap<Integer, Entity> entities;

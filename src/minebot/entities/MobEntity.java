@@ -1,7 +1,7 @@
 package minebot.entities;
 
 
-public class MobEntity extends Entity {
+public final class MobEntity extends Entity {
 	
 	public static final int CREEPER			= 50;
 	public static final int SKELETON		= 51;

@@ -9,7 +9,7 @@ import minebot.entities.*;
 import minebot.net.*;
 
 
-public class Bot extends Player{
+public final class Bot extends Player{
 	
 	private long moveTime;
 	private long lastTick;

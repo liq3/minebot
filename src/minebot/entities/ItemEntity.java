@@ -1,7 +1,6 @@
 package minebot.entities;
 
-
-public class ItemEntity extends Entity {
+public final class ItemEntity extends Entity {
 	public Item item;
 	public double roll;
 	

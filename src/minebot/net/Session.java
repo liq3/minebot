@@ -7,7 +7,7 @@ import minebot.*;
 import minebot.entities.*;
 
 
-public class Session {
+public final class Session {
 	
 	public Player player;
 	public boolean connected;

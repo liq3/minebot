@@ -1,6 +1,6 @@
 package minebot.entities;
 
-public class Item {
+public final class Item {
 	public int ID;
 	public int count;
 	public int data; // damage/metadata, depends on item

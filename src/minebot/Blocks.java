@@ -63,7 +63,7 @@ public final class Blocks {
 	public static final int    DoubleSlab          = 0x2B;
 	public static final int    Slab                = 0x2C;
 	public static final int    Brick               = 0x2D;
-	public static final int    Tnt                 = 0x2E;
+	public static final int    TNT                 = 0x2E;
 	public static final int    Bookshelf           = 0x2F;
 	public static final int    MossStone           = 0x30;
 	public static final int    Obsidian            = 0x31;

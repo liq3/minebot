@@ -7,7 +7,7 @@ import minebot.bot.Bot;
 import minebot.net.Packets;
 import minebot.net.Session;
 
-public class Minebot
+public final class Minebot
 {
 	private static Bot bot;
 	private static Session session;

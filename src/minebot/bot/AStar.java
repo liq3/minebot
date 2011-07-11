@@ -2,7 +2,7 @@ package minebot.bot;
 
 import minebot.*;
 
-public class AStar {
+public final class AStar {
 	
 	private World map;
 	
