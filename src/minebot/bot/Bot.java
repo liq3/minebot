@@ -4,8 +4,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import minebot.Config;
-import minebot.Player;
+import minebot.*;
 import minebot.entities.*;
 import minebot.net.*;
 
@@ -39,7 +38,7 @@ public class Bot extends Player{
 			
 			writer.writePositionAndLook(this);
 							
-			if (!ItemID.solid[ world.getBlock(bx(),by()-1,bz()) ] && moveList.isEmpty()) {
+			if (!Blocks.isSolid( world.getBlock(bx(),by()-1,bz()) ) && moveList.isEmpty()) {
 				addMove(0,-1,0);
 			}
 						

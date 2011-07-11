@@ -28,8 +28,8 @@ public final class PacketWriter extends DataOutputStream {
 	public PacketWriter(OutputStream outputStream) {
 		super(outputStream);
 	}
-	public void writeKeepAlive() throws IOException {
-		writeByte(PacketID.KeepAlive);
+	public void writePing() throws IOException {
+		writeByte(Packets.Ping);
 	}
 	public void writeString8(String str) throws IOException{
 		writeUTF(str);
@@ -39,37 +39,37 @@ public final class PacketWriter extends DataOutputStream {
 		write(str.getBytes("UTF-16BE"), 0, str.length()*2);
 	}
 	public void writeLoginRequest(String username) throws IOException {
-		writeByte(PacketID.LoginRequest);
+		writeByte(Packets.LoginRequest);
 		writeInt(PROTOCOL_VERSION);
 		writeString16(username);
 		writeLong(0);
 		writeByte(0);
 	}
 	public void writeHandshake(String username) throws IOException {
-		writeByte(PacketID.Handshake);
+		writeByte(Packets.Handshake);
 		writeString16(username);
 	}
 	public void writeChatMessage(String str) throws IOException {
-		writeByte(PacketID.ChatMessage);
+		writeByte(Packets.ChatMessage);
 		writeString16(str);
 	}
 	public void writeUseEntity(int target, boolean leftClick) throws IOException {
-		writeByte(PacketID.UseEntity);
+		writeByte(Packets.UseEntity);
 		writeInt(0);
 		writeInt(target);
 		writeBoolean(leftClick);
 	}
 	
 	public void writeRespawn(int worldType) throws IOException {
-		writeByte(PacketID.Respawn);
+		writeByte(Packets.Respawn);
 		writeByte((byte)worldType);
 	}
 	public void writeOnGround(boolean onGround) throws IOException {
-		writeByte(PacketID.OnGround);
+		writeByte(Packets.OnGround);
 		writeBoolean(onGround);
 	}
 	public void writePosition(Bot player) throws IOException {
-		writeByte(PacketID.Position);
+		writeByte(Packets.Position);
 		writeDouble(player.x);
 		writeDouble(player.y);
 		writeDouble(player.stance);
@@ -77,13 +77,13 @@ public final class PacketWriter extends DataOutputStream {
 		writeBoolean(player.onGround);
 	}
 	public void writeLook(Bot player) throws IOException {
-		writeByte(PacketID.Look);
+		writeByte(Packets.Look);
 		writeFloat((float)player.yaw);
 		writeFloat((float)player.pitch);
 		writeBoolean(player.onGround);
 	}
 	public void writePositionAndLook(Bot player) throws IOException {
-		writeByte(PacketID.PositionAndLook);
+		writeByte(Packets.PositionAndLook);
 		writeDouble(player.x);
 		writeDouble(player.y);
 		writeDouble(player.stance);
@@ -94,7 +94,7 @@ public final class PacketWriter extends DataOutputStream {
 	}
 	
 	public void writeDigging(int status, int x, int y, int z, int face) throws IOException {
-		writeByte(PacketID.Digging);
+		writeByte(Packets.Digging);
 		writeByte(status);
 		writeInt(x);
 		writeByte(y);
@@ -102,7 +102,7 @@ public final class PacketWriter extends DataOutputStream {
 		writeByte(face);
 	}
 	public void writeDropItem() throws IOException {
-		writeByte(PacketID.DropItem);
+		writeByte(Packets.DropItem);
 		writeByte(4);
 		writeInt(0);
 		writeByte(0);
@@ -110,7 +110,7 @@ public final class PacketWriter extends DataOutputStream {
 		writeByte(0);
 	}
 	public void writeBlockPlacement(int x, int y, int z, int dir) throws IOException {
-		writeByte(PacketID.BlockPlacement);
+		writeByte(Packets.BlockPlacement);
 		writeInt(x);
 		writeByte(y);
 		writeInt(z);
@@ -118,7 +118,7 @@ public final class PacketWriter extends DataOutputStream {
 		writeShort(-1); // No item
 	}
 	public void writeBlockPlacement(int x, int y, int z, int dir, int ID, int amount, int uses) throws IOException {
-		writeByte(PacketID.BlockPlacement);
+		writeByte(Packets.BlockPlacement);
 		writeInt(x);
 		writeByte(y);
 		writeInt(z);
@@ -130,15 +130,15 @@ public final class PacketWriter extends DataOutputStream {
 		}
 	}
 	public void writeHoldingChange(int slot) throws IOException {
-		writeByte(PacketID.HoldingChange);
+		writeByte(Packets.HoldingChange);
 		writeShort(slot);
 	}
 	public void writeAnimation(int type) throws IOException {
-		writeByte(PacketID.Animation);
+		writeByte(Packets.Animation);
 		/* TODO */
 	}
 	public void writeWindowClick() throws IOException {
-		writeByte(PacketID.WindowClick);
+		writeByte(Packets.WindowClick);
 		/* TODO */
 	}
 }

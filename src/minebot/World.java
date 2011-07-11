@@ -6,8 +6,7 @@ import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-import minebot.entities.EntityManager;
-import minebot.entities.ItemID;
+import minebot.entities.*;
 
 public final class World {
 	
@@ -174,7 +173,7 @@ public final class World {
 		int b2 = getBlock(x,y,z);
 		int b3 = getBlock(x,y+1,z);
 
-		if (ItemID.solid[b1] && !ItemID.solid[b2] && !ItemID.solid[b3]) {
+		if (Blocks.isSolid(b1) && !Blocks.isSolid(b2) && !Blocks.isSolid(b3)) {
 			return true;
 		}
 		return false;

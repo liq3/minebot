@@ -133,11 +133,11 @@ public class Session {
 		try {
 			opcode = reader.readUnsignedByte();
 			switch (opcode) {
-			case PacketID.KeepAlive:
-				writer.writeKeepAlive();
+			case Packets.Ping:
+				writer.writePing();
 				break;
 				
-			case PacketID.LoginRequest: {
+			case Packets.LoginRequest: {
 				EID = reader.readInt();
 				String serverName = readString16();
 				reader.skipBytes(9); // not required
@@ -146,7 +146,7 @@ public class Session {
 				connected = true;
 				break;
 			}
-			case PacketID.Handshake: {
+			case Packets.Handshake: {
 				String hash = readString16();
 				String authURL = String.format("http://www.minecraft.net/game/joinserver.jsp?user=%s&sessionId=%s&serverId=%s", username, sessionID, hash);
 				URL url = new URL(authURL);
@@ -160,42 +160,42 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.ChatMessage: {
+			case Packets.ChatMessage: {
 				String msg = readString16();
 				player.handleChat(msg);
 				break;
 			}
-			case PacketID.TimeUpdate: // TODO
+			case Packets.TimeUpdate: // TODO
 				reader.readLong();
 				break;
 				
-			case PacketID.EntityEqupment: // TODO
+			case Packets.EntityEqupment: // TODO
 				reader.skipBytes(10);
 				break;
 				
-			case PacketID.SpawnPosition:
+			case Packets.SpawnPosition:
 				player.spawnX = reader.readInt();
 				player.spawnY = reader.readInt();
 				player.spawnZ = reader.readInt();
 				break;
 				
-			case PacketID.UseEntity: // TODO
+			case Packets.UseEntity: // TODO
 				reader.skipBytes(9);
 				break;
 				
-			case PacketID.HealthUpdate: {
+			case Packets.HealthUpdate: {
 				int hp = reader.readShort();
 				if (hp <= 0) {
 					writer.writeRespawn(PacketWriter.DIMENSION_WORLD);
 				}
 				break;
 			}
-			case PacketID.Respawn:
+			case Packets.Respawn:
 				reader.readByte();
 				player.respawn();
 				break;
 				
-			case PacketID.PositionAndLook:
+			case Packets.PositionAndLook:
 				player.x = reader.readDouble();
 				player.stance = reader.readDouble();
 				player.y = reader.readDouble();
@@ -206,19 +206,19 @@ public class Session {
 				player.spawned = true;
 				break;
 				
-			case PacketID.UseBed: // TODO
+			case Packets.UseBed: // TODO
 				reader.skipBytes(14);
 				break;
 				
-			case PacketID.Animation: // TODO
+			case Packets.Animation: // TODO
 				reader.skipBytes(5);
 				break;
 				
-			case PacketID.EntityAction: // TODO
+			case Packets.EntityAction: // TODO
 				reader.skipBytes(5);
 				break;
 				
-			case PacketID.SpawnNamedEntity: {
+			case Packets.SpawnNamedEntity: {
 				EID = reader.readInt();
 				String name = readString16();
 				int x = reader.readInt();
@@ -231,7 +231,7 @@ public class Session {
 				world.entities.add(ent);
 				break;
 			}
-			case PacketID.SpawnPickup: {
+			case Packets.SpawnPickup: {
 				EID = reader.readInt();
 				int itemID = reader.readShort();
 				int count = reader.readByte();
@@ -247,11 +247,11 @@ public class Session {
 				world.entities.add(ent);
 				break;
 			}
-			case PacketID.CollectItem: // TODO
+			case Packets.CollectItem: // TODO
 				reader.skipBytes(8);
 				break;
 				
-			case PacketID.SpawnObject: {
+			case Packets.SpawnObject: {
 				int EID = reader.readInt();
 				int type = reader.readByte();
 				int x = reader.readInt();
@@ -265,7 +265,7 @@ public class Session {
 				world.entities.add(ent);
 				break;
 			}
-			case PacketID.SpawnMob: {
+			case Packets.SpawnMob: {
 				int EID = reader.readInt();
 				int type = reader.readByte();
 				int x = reader.readInt();
@@ -279,17 +279,17 @@ public class Session {
 				world.entities.add(ent);
 				break;
 			}
-			case PacketID.Painting: { // TODO
+			case Packets.Painting: { // TODO
 				int EID = reader.readInt();
 				readString16();
 				reader.skipBytes(16);
 				break;
 			}
-			case PacketID.StanceUpdate: // this packet is largely unused/unknown
+			case Packets.StanceUpdate: // this packet is largely unused/unknown
 				reader.skipBytes(18);	// but we'll read it just in case
 				break;
 				
-			case PacketID.EntityVelocity: {
+			case Packets.EntityVelocity: {
 				int EID = reader.readInt();
 				int vx = reader.readShort();
 				int vy = reader.readShort();
@@ -300,16 +300,16 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.DestroyEntity: {
+			case Packets.DestroyEntity: {
 				int EID = reader.readInt();
 				world.entities.remove(EID);
 				break;
 			}
-			case PacketID.Entity:
+			case Packets.Entity:
 				reader.readInt();
 				break;
 				
-			case PacketID.EntityRelMove: {
+			case Packets.EntityRelMove: {
 				int EID = reader.readInt();
 				int dx = reader.readByte();
 				int dy = reader.readByte();
@@ -320,7 +320,7 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.EntityLook: {
+			case Packets.EntityLook: {
 				int EID = reader.readInt();
 				int yaw = reader.readByte();
 				int pitch = reader.readByte();
@@ -330,7 +330,7 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.EntityRelMoveLook: {
+			case Packets.EntityRelMoveLook: {
 				int EID = reader.readInt();
 				int dx = reader.readByte();
 				int dy = reader.readByte();
@@ -344,7 +344,7 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.EntityTeleport: {
+			case Packets.EntityTeleport: {
 				int EID = reader.readInt();
 				int x = reader.readInt();
 				int y = reader.readInt();
@@ -358,20 +358,20 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.EntityStatus: // TODO
+			case Packets.EntityStatus: // TODO
 				reader.skipBytes(5);
 				break;
 				
-			case PacketID.AttachEntity: // TODO
+			case Packets.AttachEntity: // TODO
 				reader.skipBytes(8);
 				break;
 				
-			case PacketID.EntityMetadata: { // TODO
+			case Packets.EntityMetadata: { // TODO
 				int EID = reader.readInt();
 				readMetadata();
 				break;
 			}
-			case PacketID.ChunkAction: {
+			case Packets.ChunkAction: {
 				int cx = reader.readInt();
 				int cz = reader.readInt();
 				boolean create = reader.readBoolean();
@@ -382,7 +382,7 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.ChunkLoad: {
+			case Packets.ChunkLoad: {
 				int x = reader.readInt();
 				int y = reader.readShort();
 				int z = reader.readInt();
@@ -394,7 +394,7 @@ public class Session {
 				world.readChunkData(x, y, z, sx+1, sy+1, sz+1, data);
 				break;
 			}
-			case PacketID.MultiBlockChange: {
+			case Packets.MultiBlockChange: {
 				int cx = reader.readInt();
 				int cz = reader.readInt();
 				int len = reader.readShort();
@@ -404,7 +404,7 @@ public class Session {
 				world.multiBlockChange(cx, cz, len, coords, types, metadata);
 				break;
 			}
-			case PacketID.BlockChange: {
+			case Packets.BlockChange: {
 				int x = reader.readInt();
 				int y = reader.readByte();
 				int z = reader.readInt();
@@ -414,39 +414,39 @@ public class Session {
 				world.setData(x, type, z, metadata);
 				break;
 			}
-			case PacketID.BlockAction: // TODO
+			case Packets.BlockAction: // TODO
 				reader.skipBytes(12);
 				break;
 				
-			case PacketID.Explosion: { // TODO
+			case Packets.Explosion: { // TODO
 				reader.skipBytes(28);
 				int count = reader.readInt();
 				reader.skipBytes(3*count);
 				break;
 			}
-			case PacketID.SoundEffect: // TODO
+			case Packets.SoundEffect: // TODO
 				reader.skipBytes(17);
 				break;
 				
-			case PacketID.NewState: // TODO
+			case Packets.NewState: // TODO
 				reader.readByte();
 				break;
 				
-			case PacketID.Thunderbolt: // TODO
+			case Packets.Thunderbolt: // TODO
 				reader.skipBytes(17);
 				break;
 				
-			case PacketID.OpenWindow: // TODO
+			case Packets.OpenWindow: // TODO
 				reader.skipBytes(2);
 				readString8();
 				reader.readByte();
 				break;
 				
-			case PacketID.CloseWindow: // TODO
+			case Packets.CloseWindow: // TODO
 				reader.readByte();
 				break;
 				
-			case PacketID.SetSlot: {
+			case Packets.SetSlot: {
 				reader.readByte();
 				int slot = reader.readShort();
 				int itemID = reader.readShort();
@@ -462,7 +462,7 @@ public class Session {
 				}
 				break;
 			}
-			case PacketID.WindowItem: {
+			case Packets.WindowItem: {
 				reader.readByte();
 				int len = reader.readShort();
 				int count, uses;
@@ -477,15 +477,15 @@ public class Session {
 				player.inventory.print();
 				break;
 			}
-			case PacketID.UpdateProgressBar: // TODO
+			case Packets.UpdateProgressBar: // TODO
 				reader.skipBytes(5);
 				break;
 				
-			case PacketID.Transaction: // TODO
+			case Packets.Transaction: // TODO
 				reader.skipBytes(5);
 				break;
 				
-			case PacketID.UpdateSign: // TODO
+			case Packets.UpdateSign: // TODO
 				reader.skipBytes(10);
 				System.out.println(readString16());
 				readString16();
@@ -493,17 +493,17 @@ public class Session {
 				readString16();
 				break;
 				
-			case PacketID.MapData: { // TODO
+			case Packets.MapData: { // TODO
 				reader.skipBytes(4);
 				int len = reader.readUnsignedByte();
 				reader.skipBytes(len);
 				break;
 			}
-			case PacketID.IncrementStatistic: // TODO
+			case Packets.IncrementStatistic: // TODO
 				reader.skipBytes(5);
 				break;
 				
-			case PacketID.Kick: {
+			case Packets.Kick: {
 				String reason = readString16();
 				System.out.println("Kicked: " + reason);
 				System.exit(0);
