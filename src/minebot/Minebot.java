@@ -4,7 +4,6 @@ import java.io.*;
 
 
 import minebot.bot.Bot;
-import minebot.entities.Items;
 import minebot.net.Packets;
 import minebot.net.Session;
 
